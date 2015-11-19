@@ -43,4 +43,4 @@ from an address that you issued the last successful WRITE to will give the same 
     * Batching is submiting more than one request to a latency heavy service, to armotize the cost of the latency and improve throughput.
     * Dallying is waiting to fill up buffers before batching requests, to further improve throughput, but will most likely increase latency.
 
-3. Caching is an example of fast path optimization, as the code for the common path will likely stay in cache as it is frequently used, thereby improving performance.
+3. Caching the results to frequent requests is a way of fast path optimizaion, as we do not have to perform the calculation every time.
