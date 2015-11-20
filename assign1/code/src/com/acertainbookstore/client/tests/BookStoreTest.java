@@ -112,17 +112,8 @@ public class BookStoreTest {
 		StockBook bookInList = listBooks.get(0);
 		StockBook addedBook = getDefaultBook();
 
-		assertTrue(bookInList.getISBN() == addedBook.getISBN()
-				&& bookInList.getTitle().equals(addedBook.getTitle())
-				&& bookInList.getAuthor().equals(addedBook.getAuthor())
-				&& bookInList.getPrice() == addedBook.getPrice()
-				&& bookInList.getSaleMisses() == addedBook.getSaleMisses()
-				&& bookInList.getAverageRating() == addedBook
-						.getAverageRating()
-				&& bookInList.getTimesRated() == addedBook.getTimesRated()
-				&& bookInList.getTotalRating() == addedBook.getTotalRating()
-				&& bookInList.isEditorPick() == addedBook.isEditorPick());
-
+		assertEquals(0, bookInList.getNumCopies());
+		TestUtil.assertStockBookEq(addedBook, bookInList, TestUtil.CHECK_NUMCOPIES.IGNORE_NUMCOPIES, TestUtil.CHECK_SALESMISSES.CHECK_SALESMISSES);
 	}
 
 	/**
