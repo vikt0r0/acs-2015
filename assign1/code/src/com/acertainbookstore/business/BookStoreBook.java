@@ -203,7 +203,7 @@ public class BookStoreBook extends ImmutableBook {
 	 * 
 	 * @return
 	 */
-	public StockBook immutableStockBook() {
+	public ImmutableStockBook immutableStockBook() {
 		return new ImmutableStockBook(this.getISBN(), new String(
 				this.getTitle()), new String(this.getAuthor()),
 				this.getPrice(), this.numCopies, this.saleMisses,
