@@ -1,1 +1,14 @@
 .DS_Store
+
+
+#TeX files
+*.aux
+*.log
+*.fdb_latexmk
+*.out
+*.bbl
+*.bcf
+*.fls
+*.blg
+*.run.xml
+*_region_.tex
