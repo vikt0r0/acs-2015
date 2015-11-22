@@ -84,7 +84,7 @@
 \subsection{Questions 1: Fundamental Abstractions}
 \begin{enumerate}
 \item{
-The top-level abstraction makes use of location addressed memory, i.e. an N-bit memory address mapping a byte of the address space. Each machine $m_i$ in the cluster contains $n_i$ bytes of memory and the memory is directly mapped to address ranges in the single address space in a contigous manner. This entails that the only valid addresses of the address space are 0 through $\sum_{i=1}^{K} n_{i}$.
+The top-level abstraction makes use of location addressed memory, i.e. an N-bit memory address mapping a byte of the address space. Each machine $m_i$ in the cluster contains $n_i$ bytes of memory and the memory is directly mapped to address ranges in the single address space in a contiguous manner. This entails that the only valid addresses of the address space are 0 through $\sum_{i=1}^{K} n_{i}$.
 
 The naming scheme consists of issuing READ/WRITE request to a central server, which looks up what intervals of the memory map to which machines. The lookup function is implemented with a table. A name identifying the machine is returned to the client, which in turn issues the request to machine holding the requested data.
 
