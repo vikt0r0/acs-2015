@@ -1,25 +1,24 @@
 % !TEX TS-program = pdflatex
 \documentclass[11pt,a4paper,english]{article}
-\usepackage[ansinew]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[obeyspaces, hyphens]{url}
 \usepackage[top=4cm, bottom=4cm, left=3cm, right=3cm]{geometry}
 \usepackage{enumerate}
 \usepackage{amsmath}
-\usepackage[pdftex]{graphicx}
 \usepackage{mdwlist}
-\usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{cite}
 \usepackage{amsmath}
-\usepackage{ulem}
+\usepackage[normalem]{ulem} % ulem enables strikethrough and more, but makes
+                            % \emph underline by default :(
 \usepackage{babel}
 \usepackage{fancyvrb}
 \usepackage{verbatimbox}
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{minted}
-\usepackage{color}
+\usepackage{xcolor}
 \usepackage{csquotes}
 \usepackage{listings}
 \usepackage{graphicx}
@@ -27,6 +26,8 @@
 \usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{lmodern} % better font
+\usepackage{hyperref} % always load hyper ref in the end
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \newcommand*\justify{%
