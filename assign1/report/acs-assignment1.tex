@@ -27,6 +27,8 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{lmodern} % better font
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
 \usepackage{hyperref} % always load hyper ref in the end
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
@@ -46,6 +48,7 @@
 
 \captionsetup[listing]{aboveskip=5pt,belowskip=\baselineskip}
 
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO: }#1}}
 
 %\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
 %\renewcommand\listingscaption{Code}
@@ -91,9 +94,62 @@ The naming scheme consists of issuing READ/WRITE request to a central server, wh
 The design is scalable in the sense that adding a machine machine, $m_{K+1}$, to the array essentially means adding a table entry with the interval corresponding to the address space range in constant time. In this case the entry $([\sum_{i=1}^{K} n_{i}; \sum_{i=1}^{K+1} n_{i}], m_{K+1})$. This increases the range of valid addresses by $n_{k+1}$.
 
 Client-machine communication is assumed to facilitate positive acknowledgments with retransmissions for requests. In the case a request can not be properly delivered, the central server or machine holding the requested data is assumed to be in an erronous state or unavailable. If the central server is down, it will not be possible}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item Here we show pseudocode for the API
+
+\todo{Write some more text}
+
+\todo{consider if pesudocode should show timeout/throwing exception}
+
+\begin{algorithm}[H]
+\caption{READ}
+\begin{algorithmic}[1]
+\Procedure{READ}{\texttt{addr}}:
+\State client send \texttt{addr} to central server
+\State central server compute \texttt{machineID} for \texttt{addr}
+\State central server send \texttt{machineID} to client
+\smallskip
+\State client send \texttt{addr} to \texttt{machineID}
+\State machine checks if \texttt{addr} falls into address space it controls
+\State machine calculates local memmory address, and reads \texttt{data}
+\State machine send \texttt{data} to client
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{WRITE}
+\begin{algorithmic}[1]
+\Procedure{WRITE}{\texttt{addr}, \texttt{data}}:
+\State client send \texttt{addr} to central server
+\State central server compute \texttt{machineID} for \texttt{addr}
+\State central server send \texttt{machineID} to client
+\smallskip
+\State client send \texttt{addr} and \texttt{data} to \texttt{machineID}
+\State machine checks if \texttt{addr} falls into address space it controls
+\State machine calculates local memmory address, and writes \texttt{data} to that location
+\State machine sends ACK to client
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \todo{Are they atomic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \todo{assumptions, dynamic join/leave}
+
+If a machine controlling memory for address $[i,j)$ goes down (eg. power failure),
+we cannot remap those value. Doing so would violate the invariant that \texttt{READ}'ing
+from an address that you issued the last successful \texttt{WRITE} to will give the same data.
+
 \end{enumerate}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Question 2: Techniques for Performance}
 
 \begin{enumerate}
