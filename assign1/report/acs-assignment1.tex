@@ -94,6 +94,26 @@ Client-machine communication is assumed to facilitate positive acknowledgments w
 \end{enumerate}
 
 
+\subsection{Question 2: Techniques for Performance}
+
+\begin{enumerate}
+\item Concurrency enables us to process more than one request at once, which can
+  reduce the average latency over serial execution, as all requests do not need
+  to wait for a slow IO device to complete (ie disk access). However, this
+  assumes the different threads do not spend too much time waiting to acquire
+  locks, or even deadlocks.
+
+\item \emph{Batching} is submitting more than one request to a latency heavy
+  service, to amortize the cost of the latency and improve
+  throughput. \emph{Dallying} is waiting to fill up buffers before batching
+  requests, to further improve throughput, but will most likely increase
+  latency.
+
+\item Caching the results to frequent requests is a way of fast path
+  optimization, as we do not have to perform the whole computation every time.
+\end{enumerate}
+
+
 %\bibliographystyle{plain}
 %\bibliography{references}
 
