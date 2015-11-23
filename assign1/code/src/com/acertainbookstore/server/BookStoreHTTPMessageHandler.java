@@ -18,6 +18,8 @@ import com.acertainbookstore.business.BookCopy;
 import com.acertainbookstore.business.BookEditorPick;
 import com.acertainbookstore.business.CertainBookStore;
 import com.acertainbookstore.business.StockBook;
+import com.acertainbookstore.business.BookRating;
+import com.acertainbookstore.interfaces.BookStore;
 import com.acertainbookstore.utils.BookStoreConstants;
 import com.acertainbookstore.utils.BookStoreException;
 import com.acertainbookstore.utils.BookStoreMessageTag;
@@ -243,9 +245,27 @@ public class BookStoreHTTPMessageHandler extends AbstractHandler {
                 response.getWriter().println(listBooksxmlString);
                 break;
 
+            case RATEBOOKS:
+                xml = BookStoreUtility.extractPOSTDataFromRequest(request);
+
+                Set<BookRating> ratings = (Set<BookRating>) BookStoreUtility
+                    .deserializeXMLStringToObject(xml);
+
+                bookStoreResponse = new BookStoreResponse();
+                try {
+                    myBookStore.rateBooks(ratings);
+                } catch (BookStoreException ex) {
+                    bookStoreResponse.setException(ex);
+                }
+                String ret = BookStoreUtility
+                    .serializeObjectToXMLString(bookStoreResponse);
+                response.getWriter().print(ret);
+                break;
+
             default:
                 System.out.println("Unhandled message tag");
                 break;
+
             }
         }
         // Mark the request as handled so that the HTTP response can be sent

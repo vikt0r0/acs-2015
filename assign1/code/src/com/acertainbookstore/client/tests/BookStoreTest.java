@@ -17,6 +17,7 @@ import com.acertainbookstore.business.BookCopy;
 import com.acertainbookstore.business.CertainBookStore;
 import com.acertainbookstore.business.ImmutableStockBook;
 import com.acertainbookstore.business.StockBook;
+import com.acertainbookstore.business.BookRating;
 import com.acertainbookstore.client.BookStoreHTTPProxy;
 import com.acertainbookstore.client.StockManagerHTTPProxy;
 import com.acertainbookstore.interfaces.BookStore;
@@ -26,7 +27,7 @@ import com.acertainbookstore.utils.BookStoreException;
 
 /**
  * Test class to test the BookStore interface
- * 
+ *
  */
 public class BookStoreTest {
 
@@ -63,14 +64,23 @@ public class BookStoreTest {
      */
     public void addBooks(int isbn, int copies) throws BookStoreException {
         Set<StockBook> booksToAdd = new HashSet<StockBook>();
-        StockBook book = new ImmutableStockBook(isbn, "Test of Thrones",
-                "George RR Testin'", (float) 10, copies, 0, 0, 0, false);
-        booksToAdd.add(book);
+        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 1,
+                                              "The Art of Computer Programming",
+                                              "Donald Knuth", (float) 300,
+                                              NUM_COPIES, 0, 0, 0, false));
+        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 2,
+                                              "The C Programming Language",
+                                              "Dennis Ritchie and Brian Kerninghan",
+                                              (float) 50, NUM_COPIES,
+                                              0, 0, 0, false));
+
         storeManager.addBooks(booksToAdd);
     }
 
     /**
      * Helper method to get the default book used by initializeBooks
+     *
+     * @return
      */
     public StockBook getDefaultBook() {
         return new ImmutableStockBook(TEST_ISBN, "Harry Potter and JUnit",
@@ -271,7 +281,7 @@ public class BookStoreTest {
         // Get books with that ISBN
 
         List<Book> books = client.getBooks(isbnList);
-        // Make sure the lists equal each other
+        // Make sure the lists equal each otherq
         assertTrue(books.containsAll(booksToAdd)
                 && books.size() == booksToAdd.size());
 
@@ -305,6 +315,78 @@ public class BookStoreTest {
 
     }
 
+    /**
+     * Tests that books valid and existing books get their ratings
+     * updated correctly
+     */
+    @Test
+    public void testUpdateRating() throws BookStoreException {
+        // Add some books before we begin
+
+        Set<StockBook> booksToAdd = new HashSet<StockBook>();
+        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 1,
+                                              "The Art of Computer Programming",
+                                              "Donald Knuth", (float) 300,
+                                              NUM_COPIES, 0, 0, 0, false));
+        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 2,
+                                              "The C Programming Language",
+                                              "Dennis Ritchie and Brian Kerninghan",
+                                              (float) 50, NUM_COPIES,
+                                              0, 0, 0, false));
+
+        storeManager.addBooks(booksToAdd);
+
+        //HashSet<BookCopy>
+        HashSet<BookRating> ratings = new HashSet<BookRating>();
+        ratings.add(new BookRating(TEST_ISBN + 1, 5));
+        ratings.add(new BookRating(TEST_ISBN + 2, 3));
+
+        client.rateBooks(ratings);
+
+
+        // Check that the ratings had the intended effect
+        List<StockBook> books = storeManager.getBooks();
+        for (StockBook book : books) {
+            switch (book.getISBN()) {
+            case TEST_ISBN + 1:
+                assertTrue(book.getTotalRating() == 5 &&
+                           book.getTimesRated() == 1);
+                System.out.println(book.getTotalRating());
+            case TEST_ISBN + 2:
+                assertTrue(book.getTotalRating() == 4 &&
+                           book.getTimesRated() == 1);
+                System.out.println(book.getTotalRating());
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Tests that rateBooks returns an exception when called with a
+     * non-existing book
+     */
+    @Test
+    public void testRateNonExistingISBN() throws BookStoreException {
+        List<StockBook> preTestBooks = storeManager.getBooks();
+
+        HashSet<BookRating> rateBooks = new HashSet<BookRating>();
+        rateBooks.add(new BookRating(1337, 5));
+
+        try {
+            client.rateBooks(rateBooks);
+            fail();
+        } catch (BookStoreException ex) {
+            ;
+        }
+
+        // Make sure that ratings were unaffected
+        List<StockBook> postTestBooks = storeManager.getBooks();
+        assertTrue(preTestBooks.containsAll(postTestBooks)
+                   && preTestBooks.size() == postTestBooks.size());
+
+    }
+    
     @AfterClass
     public static void tearDownAfterClass() throws BookStoreException {
         storeManager.removeAllBooks();
