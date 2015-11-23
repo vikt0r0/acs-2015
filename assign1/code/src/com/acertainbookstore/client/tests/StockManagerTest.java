@@ -218,22 +218,9 @@ public class StockManagerTest {
 		StockBook bookInList = listBooks.get(0);
 		StockBook addedBook = getDefaultBook();
 
-		assertTrue(bookInList.getNumCopies() == addedBook.getNumCopies()
-				+ copies_to_add);
+		assertTrue(bookInList.getNumCopies() == addedBook.getNumCopies() + copies_to_add);
 
-		// Painful hack since we want to check all fields except num copies on
-		// an immutable object
-		assertTrue(bookInList.getISBN() == addedBook.getISBN()
-				&& bookInList.getTitle().equals(addedBook.getTitle())
-				&& bookInList.getAuthor().equals(addedBook.getAuthor())
-				&& bookInList.getPrice() == addedBook.getPrice()
-				&& bookInList.getSaleMisses() == addedBook.getSaleMisses()
-				&& bookInList.getAverageRating() == addedBook
-						.getAverageRating()
-				&& bookInList.getTimesRated() == addedBook.getTimesRated()
-				&& bookInList.getTotalRating() == addedBook.getTotalRating()
-				&& bookInList.isEditorPick() == addedBook.isEditorPick());
-
+		TestUtil.assertStockBookEq(addedBook, bookInList, TestUtil.CHECK_NUMCOPIES.IGNORE_NUMCOPIES, TestUtil.CHECK_SALESMISSES.CHECK_SALESMISSES);
 	}
 
 	/**
@@ -436,6 +423,58 @@ public class StockManagerTest {
 
 		booksInStoreList = storeManager.getBooks();
 		assertTrue(booksInStoreList.size() == 0);
+	}
+
+	@Test
+	public void testGetBooksInDemand() throws BookStoreException {
+		List<StockBook> booksInDemand;
+
+		Set<BookCopy> booksToBuy = new HashSet<BookCopy>();
+		booksToBuy.add(new BookCopy(TEST_ISBN, NUM_COPIES));
+
+		// initially there should be no books in demand
+		booksInDemand = storeManager.getBooksInDemand();
+		assertEquals(0, booksInDemand.size());
+
+		// Buy books once (should not put anything in demand)
+		client.buyBooks(booksToBuy);
+		booksInDemand = storeManager.getBooksInDemand();
+		assertEquals(0, booksInDemand.size());
+
+		// Try to buy books (should put book in demand)
+		try {
+			client.buyBooks(booksToBuy);
+			fail("exception should be thrown");
+		} catch (BookStoreException ex) {
+			// all is good
+		}
+		booksInDemand = storeManager.getBooksInDemand();
+		assertEquals(1, booksInDemand.size());
+		StockBook bookInDemand = booksInDemand.get(0);
+		TestUtil.assertStockBookEq(getDefaultBook(), bookInDemand, TestUtil.CHECK_NUMCOPIES.IGNORE_NUMCOPIES, TestUtil.CHECK_SALESMISSES.IGNORE_SALESMISSES);
+
+		// Add book again, should not have any books in demand now
+		Set<BookCopy> booksToAdd = new HashSet<BookCopy>();
+		booksToAdd.add(new BookCopy(getDefaultBook().getISBN(), getDefaultBook().getNumCopies()));
+		storeManager.addCopies(booksToAdd);
+		booksInDemand = storeManager.getBooksInDemand();
+		assertEquals(0, booksInDemand.size());
+
+		// Make book in demand once more
+		client.buyBooks(booksToBuy);
+		try {
+			client.buyBooks(booksToBuy);
+			fail("exception should be thrown");
+		} catch (BookStoreException ex) {
+			// all is good
+		}
+
+		// Removing all books should also clear booksInDemand
+		storeManager.removeAllBooks();
+		List<StockBook> booksInStoreList = storeManager.getBooks();
+		assertTrue(booksInStoreList.size() == 0);
+		booksInDemand = storeManager.getBooksInDemand();
+		assertEquals(0, booksInDemand.size());
 	}
 
 	@AfterClass
