@@ -432,10 +432,10 @@ public class BookStoreTest {
         StockBook b2Rated = books.stream().filter(b -> b.equals(b2)).
             collect(Collectors.toList()).get(0);
 
-		assertEquals(1,b1Rated.getTimesRated());
-		assertEquals(1,b2Rated.getTimesRated());
-		assertEquals(5,b1Rated.getTotalRating());
-		assertEquals(3,b2Rated.getTotalRating());
+        assertEquals(1,b1Rated.getTimesRated());
+        assertEquals(1,b2Rated.getTimesRated());
+        assertEquals(5,b1Rated.getTotalRating());
+        assertEquals(3,b2Rated.getTotalRating());
 
     }
 
