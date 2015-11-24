@@ -3,16 +3,9 @@
  */
 package com.acertainbookstore.business;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.acertainbookstore.interfaces.BookStore;
 import com.acertainbookstore.interfaces.StockManager;
@@ -277,7 +270,14 @@ public class CertainBookStore implements BookStore, StockManager {
     @Override
     public synchronized List<Book> getTopRatedBooks(int numBooks)
             throws BookStoreException {
-        throw new BookStoreException("Not implemented");
+        if (numBooks < 1)
+            throw new BookStoreException("numBooks = " + numBooks + ", but it must be positive");
+
+        List<Book> listBooks = bookMap.values().stream().sorted(
+                (b1,b2) -> Double.compare(b2.getAverageRating(), b1.getAverageRating())
+        ).map(b -> b.immutableBook()).collect(Collectors.toList());
+
+        return listBooks.subList(0, numBooks);
     }
 
     @Override
