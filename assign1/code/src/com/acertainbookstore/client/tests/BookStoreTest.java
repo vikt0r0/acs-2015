@@ -439,6 +439,41 @@ public class BookStoreTest {
 
     }
 
+	/**
+	 * Tests all-or-nothing semantics for rateBooks
+	 */
+	@Test
+	public void testRateBooksAllOrNothing() throws BookStoreException {
+		// Add some books before we begin
+		Set<StockBook> books = getBooks(100, 0.0, 0.0, 0);
+
+		storeManager.addBooks(books);
+
+		// Generate ratings
+		List<BookRating> ratings = books.stream().map(
+			b -> new BookRating(b.getISBN(), 5)
+		).collect(Collectors.toList());
+
+		// Insert rating with invalid ISBN
+		ratings.get(50).setISBN(-1);
+
+		try {
+			client.rateBooks(new HashSet<BookRating>(ratings));
+			fail();
+		} catch (BookStoreException e) {
+			;
+		}
+
+		List<StockBook> storeBooks = storeManager.getBooks();
+
+		assertTrue(books.stream().allMatch(
+			b -> storeBooks.stream().anyMatch(
+				b2 -> b.getISBN() == b2.getISBN() &&
+				b.getTimesRated() == b2.getTimesRated() &&
+				b.getTotalRating() == b2.getTotalRating())
+		));
+	}
+
     /**
      * Tests that rateBooks returns an exception when called with a
      * non-existing book
