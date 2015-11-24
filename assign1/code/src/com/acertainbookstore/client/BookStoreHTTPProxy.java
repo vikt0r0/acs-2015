@@ -39,24 +39,12 @@ public class BookStoreHTTPProxy implements BookStore {
         setServerAddress(serverAddress);
         client = new HttpClient();
         client.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
-        client.setMaxConnectionsPerAddress(BookStoreClientConstants.CLIENT_MAX_CONNECTION_ADDRESS); // max
-                                                                                                    // concurrent
-                                                                                                    // connections
-                                                                                                    // to
-                                                                                                    // every
-                                                                                                    // address
+        // max concurrent connections to every address
+        client.setMaxConnectionsPerAddress(BookStoreClientConstants.CLIENT_MAX_CONNECTION_ADDRESS);
+        // max threads; seconds timeout; if no server reply, the request expires
         client.setThreadPool(new QueuedThreadPool(
-                BookStoreClientConstants.CLIENT_MAX_THREADSPOOL_THREADS)); // max
-                                                                            // threads
-        client.setTimeout(BookStoreClientConstants.CLIENT_MAX_TIMEOUT_MILLISECS); // seconds
-                                                                                    // timeout;
-                                                                                    // if
-                                                                                    // no
-                                                                                    // server
-                                                                                    // reply,
-                                                                                    // the
-                                                                                    // request
-                                                                                    // expires
+                BookStoreClientConstants.CLIENT_MAX_THREADSPOOL_THREADS));
+        client.setTimeout(BookStoreClientConstants.CLIENT_MAX_TIMEOUT_MILLISECS); 
         client.start();
     }
 
@@ -130,9 +118,17 @@ public class BookStoreHTTPProxy implements BookStore {
 
     @Override
     public void rateBooks(Set<BookRating> bookRating) throws BookStoreException {
-        // TODO Auto-generated method stub
-        throw new BookStoreException("Not implemented");
-        
+        ContentExchange exchange = new ContentExchange();
+        String urlString = serverAddress + "/" + BookStoreMessageTag.RATEBOOKS;
+
+        String bookRatingXmlString = BookStoreUtility.serializeObjectToXMLString(bookRating);
+        exchange.setMethod("POST");
+        exchange.setURL(urlString);
+        System.out.println("String: " + bookRatingXmlString);
+        Buffer requestContent = new ByteArrayBuffer(bookRatingXmlString);
+        exchange.setRequestContent(requestContent);
+
+        BookStoreUtility.SendAndRecv(this.client, exchange);
     }
 
     @Override
