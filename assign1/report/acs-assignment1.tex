@@ -153,14 +153,22 @@ will not be possible
 \end{algorithm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item \todo{Are they atomic}
+\item The READ and WRITE operations are atomic operations. This means that
+  operations are lever interleaved, such that a READ can return data from two
+  different WRITEs. We assume this is handled by the memory controller. If we
+  need to provide atomicity for arbitrary sized writes (like a whole data
+  structure), we could employ a distributed conservative two-phase locking.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item \todo{assumptions, dynamic join/leave}
-
-If a machine controlling memory for address $(i,j)$ goes down (e.g.\ power failure),
-we cannot remap those value. Doing so would violate the invariant that \texttt{READ}'ing
-from an address that you issued the last successful \texttt{WRITE} to will give the same data.
+\item Our strategy works best when the machines are fixed at initialization. We
+  could add new machines by adding entries in the table, but the increased
+  memory would need to be updated to clients. If a machine leaves, the memory it
+  controls cannot be remapped, as doing so would violate the invariant that
+  \texttt{READ}'ing from an address that you issued the last successful
+  \texttt{WRITE} to will give the same data. However, we could replace a machine
+  by an other one of same size (or greater), by copying the data over, changing
+  the \texttt{machineID} in the table to the new one, and possibly adding a
+  second entry to reflect extra memory the new machine has.
 
 \end{enumerate}
 
@@ -242,17 +250,22 @@ book store before and after a failing test are identical.
     over TCP/IP for its transport, meaning that domain names can be used to
     refer to a BookStore service provider instance. On an even lower level, the
     name-to-IP translation (provided by DNS) itself as well as all communication
-    using TCP/IP relies on another naming schemes IP addresses, that refer to
-    the network interface of a system connected to the internet.}
+    using TCP/IP relies on another naming scheme, namely IP addresses. In this scheme each IP corresponds to a network interface of a system connected to the internet.}
 
-\item{Among other services, DNS provides name-to-IP address translation for
-    TCP/IP. DNS is implemented with a multi-level, hierarchical structure.  For
-    instance, \todo{for instance what?} }
+\item{DNS (along with other services) provides name-to-IP address translation for
+    TCP/IP. DNS translation is implemented as a multi-level, recursive lookup scheme in which different parts of a domain name corresponds to a different level of the DNS hierarchy. This is depicted in Figure \ref{fig:dns}.
+    
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/dns.png}
+    \caption{DNS hierarchy. Lower levels correspond to more specific names.}
+    \label{fig:dns}
+\end{figure}
+
+For instance, in order to resolve the name \url{service.bookstore.com.}, the root node (at the top-level of the hierarchy; corresponding to the rightmost "\url{.}" of the name) is first queried in order to determine what node in the next level of the DNS hierarchy is responsible for address translation of the next part of the domain, i.e. "\url{.com}". DNS then directs the client to query this node for name-to-IP-translation recursively. This process is usually repeated until the response from DNS indicates whether an IP corresponding to the query name could be found or not.}
 \end{enumerate}
 
-
 \subsection{RPC Semantics}
-
 The semantics of RPC used for \texttt{acertainbookstore.com} is ``at most
 once''. This means the request from the client is at most executed once on the
 server side, and if any errors occur they are exposed to the client.
