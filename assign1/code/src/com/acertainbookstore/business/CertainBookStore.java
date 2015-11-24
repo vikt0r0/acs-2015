@@ -330,11 +330,9 @@ public class CertainBookStore implements BookStore, StockManager {
                                              ISBN +
                                              BookStoreConstants.NOT_AVAILABLE);
             }
-            book.addRating(rating.getRating());
         }
         // If everything is OK, set ratings on all books.
         for (BookRating rating : bookRating) {
-            System.out.println(rating.getRating());
             book = bookMap.get(rating.getISBN());
             book.addRating(rating.getRating());
         }

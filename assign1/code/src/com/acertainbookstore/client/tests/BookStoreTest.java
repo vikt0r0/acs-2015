@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -406,43 +407,30 @@ public class BookStoreTest {
     @Test
     public void testUpdateRating() throws BookStoreException {
         // Add some books before we begin
+		StockBook b1 = getBook(isbn++, 10, 0, 0),
+				  b2 = getBook(isbn++, 10, 0, 0);
 
         Set<StockBook> booksToAdd = new HashSet<StockBook>();
-        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 1,
-                                              "The Art of Computer Programming",
-                                              "Donald Knuth", (float) 300,
-                                              NUM_COPIES, 0, 0, 0, false));
-        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 2,
-                                              "The C Programming Language",
-                                              "Dennis Ritchie and Brian Kerninghan",
-                                              (float) 50, NUM_COPIES,
-                                              0, 0, 0, false));
+        booksToAdd.add(b1);
+		booksToAdd.add(b2);
 
         storeManager.addBooks(booksToAdd);
 
         //HashSet<BookCopy>
         HashSet<BookRating> ratings = new HashSet<BookRating>();
-        ratings.add(new BookRating(TEST_ISBN + 1, 5));
-        ratings.add(new BookRating(TEST_ISBN + 2, 3));
+        ratings.add(new BookRating(b1.getISBN(), 5));
+        ratings.add(new BookRating(b2.getISBN(), 3));
 
         client.rateBooks(ratings);
 
 
         // Check that the ratings had the intended effect
         List<StockBook> books = storeManager.getBooks();
-        for (StockBook book : books) {
-            switch (book.getISBN()) {
-            case TEST_ISBN + 1:
-                assertTrue(book.getTotalRating() == 5 &&
-                           book.getTimesRated() == 1);
-                System.out.println(book.getTotalRating());
-            case TEST_ISBN + 2:
-                assertTrue(book.getTotalRating() == 4 &&
-                           book.getTimesRated() == 1);
-                System.out.println(book.getTotalRating());
-                break;
-            }
-        }
+		StockBook b1Rated = books.stream().filter(b -> b.equals(b1)).collect(Collectors.toList()).get(0);
+		StockBook b2Rated = books.stream().filter(b -> b.equals(b2)).collect(Collectors.toList()).get(0);
+
+		assertEquals(b1,b1Rated);
+		assertEquals(b2,b2Rated);
     }
 
 
