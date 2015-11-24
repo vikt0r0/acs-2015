@@ -407,12 +407,12 @@ public class BookStoreTest {
     @Test
     public void testUpdateRating() throws BookStoreException {
         // Add some books before we begin
-		StockBook b1 = getBook(isbn++, 10, 0, 0),
-				  b2 = getBook(isbn++, 10, 0, 0);
+        StockBook b1 = getBook(isbn++, 10, 0, 0),
+            b2 = getBook(isbn++, 10, 0, 0);
 
         Set<StockBook> booksToAdd = new HashSet<StockBook>();
         booksToAdd.add(b1);
-		booksToAdd.add(b2);
+        booksToAdd.add(b2);
 
         storeManager.addBooks(booksToAdd);
 
@@ -426,13 +426,41 @@ public class BookStoreTest {
 
         // Check that the ratings had the intended effect
         List<StockBook> books = storeManager.getBooks();
-		StockBook b1Rated = books.stream().filter(b -> b.equals(b1)).collect(Collectors.toList()).get(0);
-		StockBook b2Rated = books.stream().filter(b -> b.equals(b2)).collect(Collectors.toList()).get(0);
+
+        StockBook b1Rated = books.stream().filter(b -> b.equals(b1)).
+            collect(Collectors.toList()).get(0);
+        StockBook b2Rated = books.stream().filter(b -> b.equals(b2)).
+            collect(Collectors.toList()).get(0);
 
 		assertEquals(1,b1Rated.getTimesRated());
 		assertEquals(1,b2Rated.getTimesRated());
 		assertEquals(5,b1Rated.getTotalRating());
 		assertEquals(3,b2Rated.getTotalRating());
+
+    }
+
+    /**
+     * Tests that rateBooks returns an exception when called with a
+     * non-existing book
+     */
+    @Test
+    public void testRateInvalidISBN() throws BookStoreException {
+        List<StockBook> preTestBooks = storeManager.getBooks();
+
+        HashSet<BookRating> rateBooks = new HashSet<BookRating>();
+        rateBooks.add(new BookRating(-1, 5));
+
+        try {
+            client.rateBooks(rateBooks);
+            fail();
+        } catch (BookStoreException ex) {
+            ;
+        }
+
+        // Make sure that ratings were unaffected
+        List<StockBook> postTestBooks = storeManager.getBooks();
+        assertTrue(preTestBooks.containsAll(postTestBooks)
+                   && preTestBooks.size() == postTestBooks.size());
     }
 
 

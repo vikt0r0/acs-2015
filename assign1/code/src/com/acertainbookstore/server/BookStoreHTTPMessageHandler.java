@@ -259,7 +259,7 @@ public class BookStoreHTTPMessageHandler extends AbstractHandler {
                 }
                 String ret = BookStoreUtility
                     .serializeObjectToXMLString(bookStoreResponse);
-                response.getWriter().print(ret);
+                response.getWriter().println(ret);
 
             case GETTOPRATEDBOOKS:
                 numBooksString = URLDecoder.decode(request.getParameter(BookStoreConstants.BOOK_NUM_PARAM), "UTF-8");
