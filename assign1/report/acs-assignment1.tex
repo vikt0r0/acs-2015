@@ -114,13 +114,10 @@ to be in an erronous state or unavailable. If the central server is down, it
 will not be possible
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item Here we show pseudocode for the API. For simplicity we one handle
-  \emph{one} byte a time. So storing a double could result in placing parts on
-  two machines (if you client doesn't align properly).
-
-\todo{Write some more text}
-
-\todo{consider if pesudocode should show timeout/throwing exception}
+\item Here we show pseudocode for the memory API. For simplicity we one handle
+  \emph{one} byte at a time. So storing a double could result in placing parts on
+  two machines. We do not include timeouts with retries, but after $n$ number of
+  retries waiting $x$ seconds, we will raise an exception (or segfautl) on the client.
 
 \begin{algorithm}[H]
 \caption{READ}
