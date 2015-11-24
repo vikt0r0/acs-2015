@@ -309,9 +309,21 @@ server in the DNS settings, so this should not be a big issue.
 
 \subsection{Crashes}
 
-\todo{Suppose the server-side of the architecture fails by a crash of server in
-which our CertainBookStore class is run. In this context, explain the
-following.}
+\begin{enumerate}[(a)]
+\item If the server running the \textit{CertainBookStore} class were to become
+  unavailable without a proxy, a client would experience their requests timing
+  out. If a proxy server is inserted between the client and the
+  \textit{CertainBookStore}-server the client would receive a ``502 Bad
+  Gateway'' error from the proxy instead.
+\item The caching layer could be used to serve a read-only version of the
+  service in case the backend-server fails. This would enable us to mask
+  failures from clients only requiring read-access to the data provided by the
+  service. It would, however, be unusual to employ caching proxy-servers for
+  this purpose since their primary purpose is to offload repeated data accesses
+  from reaching the backend servers. They usually provide no guarantee to hold a
+  complete copy of the data provided by a service.
+\item 
+\end{enumerate}
 
 
 %\bibliographystyle{plain}
