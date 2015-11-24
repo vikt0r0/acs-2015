@@ -17,7 +17,7 @@
 \usepackage{verbatimbox}
 \usepackage{amsfonts}
 \usepackage{amsthm}
-\usepackage{minted}
+%\usepackage{minted}
 \usepackage{xcolor}
 \usepackage{csquotes}
 \usepackage{listings}
@@ -86,14 +86,32 @@
 \section{Exercises}
 \subsection{Questions 1: Fundamental Abstractions}
 \begin{enumerate}
-\item{
-The top-level abstraction makes use of location addressed memory, i.e. an N-bit memory address mapping a byte of the address space. Each machine $m_i$ in the cluster contains $n_i$ bytes of memory and the memory is directly mapped to address ranges in the single address space in a contiguous manner. This entails that the only valid addresses of the address space are 0 through $\sum_{i=1}^{K} n_{i}$.
+\item
 
-The naming scheme consists of issuing READ/WRITE request to a central server, which looks up what intervals of the memory map to which machines. The lookup function is implemented with a table. A name identifying the machine is returned to the client, which in turn issues the request to machine holding the requested data.
+  The top-level abstraction makes use of location addressed memory i.e.\@ an N-bit
+  memory address mapping a byte of the address space. Each machine $m_i$
+  in the cluster contains $n_i$
+  bytes of memory and the memory is directly mapped to address ranges in the
+  single address space in a contiguous manner. This entails that the only valid
+  addresses of the address space are 0 through $\sum_{i=1}^{K} n_{i}$.
 
-The design is scalable in the sense that adding a machine machine, $m_{K+1}$, to the array essentially means adding a table entry with the interval corresponding to the address space range in constant time. In this case the entry $([\sum_{i=1}^{K} n_{i}; \sum_{i=1}^{K+1} n_{i}], m_{K+1})$. This increases the range of valid addresses by $n_{k+1}$.
+The naming scheme consists of issuing READ/WRITE request to a central server,
+which looks up what intervals of the memory map to which machines. The lookup
+function is implemented with a table. A name identifying the machine is returned
+to the client, which in turn issues the request to machine holding the requested
+data.
 
-Client-machine communication is assumed to facilitate positive acknowledgments with retransmissions for requests. In the case a request can not be properly delivered, the central server or machine holding the requested data is assumed to be in an erronous state or unavailable. If the central server is down, it will not be possible}
+The design is scalable in the sense that adding a machine machine, $m_{K+1}$,
+to the array essentially means adding a table entry with the interval
+corresponding to the address space range in constant time. In this case the
+entry $([\sum_{i=1}^{K} n_{i}; \sum_{i=1}^{K+1} n_{i}], m_{K+1})$.
+This increases the range of valid addresses by $n_{k+1}$.
+
+Client-machine communication is assumed to facilitate positive acknowledgments
+with retransmissions for requests. In the case a request can not be properly
+delivered, the central server or machine holding the requested data is assumed
+to be in an erronous state or unavailable. If the central server is down, it
+will not be possible
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Here we show pseudocode for the API
@@ -140,7 +158,7 @@ Client-machine communication is assumed to facilitate positive acknowledgments w
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item \todo{assumptions, dynamic join/leave}
 
-If a machine controlling memory for address $[i,j)$ goes down (eg. power failure),
+If a machine controlling memory for address $(i,j)$ goes down (e.g.\ power failure),
 we cannot remap those value. Doing so would violate the invariant that \texttt{READ}'ing
 from an address that you issued the last successful \texttt{WRITE} to will give the same data.
 
@@ -150,6 +168,14 @@ from an address that you issued the last successful \texttt{WRITE} to will give 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Programming Task}
+\subsection{Question 1: Implementation Description}
+Our implementation of the additional features an tests is fairly straight
+forward and follows the style used by the features already implemented with the assignment
+
+The all-or-nothing semantics are enforced by 
+
 \subsection{Question 2: Techniques for Performance}
 
 \begin{enumerate}
@@ -176,18 +202,40 @@ from an address that you issued the last successful \texttt{WRITE} to will give 
 \subsection{Discussion }
 \subsection{Modularity}
 \begin{enumerate}[(a)]
-\item{The service is implemented as an RPC architecture using the HTTP protocol as its transport. The architecture is modular as clients are isolated from each other and use the API defined by the method stubs implemented in client libraries for communication. The client library and service handlers are responsible for encoding and marshaling request data and responses.}
+\item{The service is implemented as an RPC architecture using the HTTP protocol
+    as its transport. The architecture is modular as clients are isolated from
+    each other and use the API defined by the method stubs implemented in client
+    libraries for communication. The client library and service handlers are
+    responsible for encoding and marshaling request data and responses.}
 
-\item{The service and the client reside in different address spaces on (most likely) different systems. This provides a high degree of isolation and entails reduced fate-sharing, should an error occur on either.}
+\item{The service and the client reside in different address spaces on (most
+    likely) different systems. This provides a high degree of isolation and
+    entails reduced fate-sharing, should an error occur on either.}
 
-\item{Instances of Java programs are run in their own JVM instance each belonging to a separate process with (presumably) separate address spaces. The degree of isolation is thus, to some extent, determined by the semantics of the the process abstraction of the host OS . In this sense, the client and service remain isolated when run locally, however the degree of fate-sharing is higher, as both will fail should the system on which they are both running fail.}
+\item{Instances of Java programs are run in their own JVM instance each
+    belonging to a separate process with (presumably) separate address
+    spaces. The degree of isolation is thus, to some extent, determined by the
+    semantics of the the process abstraction of the host OS. In this sense, the
+    client and service remain isolated when run locally, however the degree of
+    fate-sharing is higher, as both will fail should the system on which they
+    are both running fail.}
 \end{enumerate}
 
 \subsection{Naming mechanism}
 \begin{enumerate}[(a)]
-\item{Several naming mechanisms are used by the architecture, at multiple levels. These are either directly visible or used within the abstractions used by the service. On a data-level, an ISBN, for instance, uniquely identifies a book. On an architectural level the BookStore service uses HTTP over TCP/IP for its transport, meaning that domain names can be used to refer to a BookStore service provider instance. On an even lower level, the name-to-IP translation (provided by DNS) itself as well as all communication using TCP/IP relies on another naming schemes IP addresses, that refer to the network interface of a system connected to the internet.}
+\item{Several naming mechanisms are used by the architecture, at multiple
+    levels. These are either directly visible or used within the abstractions
+    used by the service. On a data-level, an ISBN, for instance, uniquely
+    identifies a book. On an architectural level the BookStore service uses HTTP
+    over TCP/IP for its transport, meaning that domain names can be used to
+    refer to a BookStore service provider instance. On an even lower level, the
+    name-to-IP translation (provided by DNS) itself as well as all communication
+    using TCP/IP relies on another naming schemes IP addresses, that refer to
+    the network interface of a system connected to the internet.}
 
-\item{Among other services, DNS provides name-to-IP address translation for TCP/IP. DNS is implemented with a multi-level, hierarchal structure.  For instance, }
+\item{Among other services, DNS provides name-to-IP address translation for
+    TCP/IP. DNS is implemented with a multi-level, hierarchical structure.  For
+    instance, }
 \end{enumerate}
 
 
@@ -202,7 +250,7 @@ server side, and if any errors occur they are exposed to the client.
 
 The usual approach to using proxy servers to increase the number of simultaneous
 users, is to make the proxy handle all incoming connections, and distribute the
-work between ``worker'' machines (ie. by round-robin).
+work between ``worker'' machines (i.e.\ by round-robin).
 
 The current setup stored the book data directly in memory, and concurrent
 modifications are handled using threads, which limits the uses to a
@@ -235,7 +283,7 @@ server in the DNS settings, so this should not be a big issue.
 
 %\section*{Appendix A}
 %\subsection*{\path{src/commented-disassembly.txt}}
-%\inputminted{text}{src/commented-disassembly.txt}
+%\inputmintedtext}{src/commented-disassembly.txt}
 
 %\pagebreak
 
@@ -243,3 +291,8 @@ server in the DNS settings, so this should not be a big issue.
 %\inputminted{c}{src/exploit.c}
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
