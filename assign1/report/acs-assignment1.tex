@@ -198,6 +198,7 @@ The all-or-nothing semantics are enforced by
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \section{Discussion on Architecture}
 \subsection{Discussion }
 \subsection{Modularity}
@@ -239,14 +240,14 @@ The all-or-nothing semantics are enforced by
 \end{enumerate}
 
 
-\subsection{Question 4: RPC Semantics}
+\subsection{RPC Semantics}
 
 The semantics of RPC used for \texttt{acertainbookstore.com} is ``at most
 once''. This means the request from the client is at most executed once on the
 server side, and if any errors occur they are exposed to the client.
 
 
-\subsection{Question 5: HTTP Proxy Servers}
+\subsection{HTTP Proxy Servers}
 
 The usual approach to using proxy servers to increase the number of simultaneous
 users, is to make the proxy handle all incoming connections, and distribute the
@@ -264,7 +265,7 @@ the database becomes a bottleneck, but it has greatly improved the situation
 from having just one machine.\footnote{and also gives you lots of features for
   handling fault tolerance for free}.
 
-\subsection{Question 6: Scalability}
+\subsection{Scalability}
 
 As outlined above, the current setup does not facilitate running the server on
 more than one machine at once, so besides upgrading the CPU to having many
