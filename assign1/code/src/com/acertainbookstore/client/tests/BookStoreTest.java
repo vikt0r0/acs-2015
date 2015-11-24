@@ -471,6 +471,30 @@ public class BookStoreTest {
 
     }
 
+    /**
+     * Tests that rateBooks returns an exception when called with an
+     * invalid rating
+     */
+    @Test
+    public void testInvalidRating() throws BookStoreException {
+        List<StockBook> preTestBooks = storeManager.getBooks();
+
+        HashSet<BookRating> rateBooks = new HashSet<BookRating>();
+        rateBooks.add(new BookRating(TEST_ISBN, 6));
+
+        try {
+            client.rateBooks(rateBooks);
+            fail();
+        } catch (BookStoreException ex) {
+            ;
+        }
+
+        // Make sure that ratings were unaffected
+        List<StockBook> postTestBooks = storeManager.getBooks();
+        assertTrue(preTestBooks.containsAll(postTestBooks)
+                   && preTestBooks.size() == postTestBooks.size());
+    }
+
     @AfterClass
     public static void tearDownAfterClass() throws BookStoreException {
         storeManager.removeAllBooks();
@@ -479,5 +503,5 @@ public class BookStoreTest {
             ((StockManagerHTTPProxy) storeManager).stop();
         }
     }
-    
+
 }
