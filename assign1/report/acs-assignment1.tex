@@ -153,14 +153,22 @@ will not be possible
 \end{algorithm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item \todo{Are they atomic}
+\item The READ and WRITE operations are atomic operations. This means that
+  operations are lever interleaved, such that a READ can return data from two
+  different WRITEs. We assume this is handled by the memory controller. If we
+  need to provide atomicity for arbitrary sized writes (like a whole data
+  structure), we could employ a distributed conservative two-phase locking.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item \todo{assumptions, dynamic join/leave}
-
-If a machine controlling memory for address $(i,j)$ goes down (e.g.\ power failure),
-we cannot remap those value. Doing so would violate the invariant that \texttt{READ}'ing
-from an address that you issued the last successful \texttt{WRITE} to will give the same data.
+\item Our strategy works best when the machines are fixed at initialization. We
+  could add new machines by adding entries in the table, but the increased
+  memory would need to be updated to clients. If a machine leaves, the memory it
+  controls cannot be remapped, as doing so would violate the invariant that
+  \texttt{READ}'ing from an address that you issued the last successful
+  \texttt{WRITE} to will give the same data. However, we could replace a machine
+  by an other one of same size (or greater), by copying the data over, changing
+  the \texttt{machineID} in the table to the new one, and possibly adding a
+  second entry to reflect extra memory the new machine has.
 
 \end{enumerate}
 
