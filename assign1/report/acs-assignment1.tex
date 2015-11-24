@@ -114,7 +114,9 @@ to be in an erronous state or unavailable. If the central server is down, it
 will not be possible
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item Here we show pseudocode for the API
+\item Here we show pseudocode for the API. For simplicity we one handle
+  \emph{one} byte a time. So storing a double could result in placing parts on
+  two machines (if you client doesn't align properly).
 
 \todo{Write some more text}
 
@@ -177,24 +179,6 @@ will not be possible
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Programming Task}
-\subsection{Question 1: Implementation Description}
-Our implementation of the additional features an tests is fairly straight
-forward and reflects the style and structure of the code included in the
-handout.
-
-The all-or-nothing semantics are enforced by validating request data before any
-changes are performed. If any invalid input data is found which would cause the
-request to fail during execution we throw an exception to abort the execution of
-the function. This means that a change-set will either be completely applied or
-not applied at all.
-
-We have ensured that the functions that we have implemented respects the
-interface of the assignment through test cases with verifies their behavior when
-processing both valid and invalid input data. In particular, we check if the
-all-or-nothing semantics are respected by making sure that the contents of the
-book store before and after a failing test are identical.
-
 \subsection{Question 2: Techniques for Performance}
 
 \begin{enumerate}
@@ -218,11 +202,23 @@ book store before and after a failing test are identical.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Discussion on Architecture}
-\subsection{Implementation Overview}
-\begin{enumerate}
-\item{}
-\end{enumerate}
+\subsection{Description of Implementatiom}
+
+Our implementation of the additional features and tests is fairly straight
+forward and reflects the style and structure of the code included in the
+handout.
+
+The all-or-nothing semantics are enforced by validating request data before any
+changes are performed. If any invalid input data is found which would cause the
+request to fail during execution we throw an exception to abort the execution of
+the function. This means that a change-set will either be completely applied or
+not applied at all.
+
+We have ensured that the functions that we have implemented respects the
+interface of the assignment through test cases with verifies their behavior when
+processing both valid and invalid input data. In particular, we check if the
+all-or-nothing semantics are respected by making sure that the contents of the
+book store before and after a failing test are identical.
 
 \subsection{Modularity}
 \begin{enumerate}[(a)]
@@ -256,9 +252,12 @@ book store before and after a failing test are identical.
     name-to-IP translation (provided by DNS) itself as well as all communication
     using TCP/IP relies on another naming scheme, namely IP addresses. In this scheme each IP corresponds to a network interface of a system connected to the internet.}
 
-\item{DNS (along with other services) provides name-to-IP address translation for
-    TCP/IP. DNS translation is implemented as a multi-level, recursive lookup scheme in which different parts of a domain name corresponds to a different level of the DNS hierarchy. This is depicted in Figure \ref{fig:dns}.
-    
+\item{DNS (along with other services) provides name-to-IP address translation
+    for TCP/IP. DNS translation is implemented as a multi-level, recursive
+    lookup scheme in which different parts of a domain name corresponds to a
+    different level of the DNS hierarchy. This is depicted in Figure
+    \ref{fig:dns}.
+
 \begin{figure}[!hbt]
     \centering
     \includegraphics[width=0.6\textwidth]{img/dns.png}
@@ -267,6 +266,7 @@ book store before and after a failing test are identical.
 \end{figure}
 
 For instance, in order to resolve the name \url{service.bookstore.com.}, the root node (at the top-level of the hierarchy; corresponding to the rightmost "\url{.}" of the name) is first queried in order to determine what node in the next level of the DNS hierarchy is responsible for address translation of the next part of the domain, i.e. "\url{.com}". DNS then directs the client to query this node for name-to-IP-translation recursively (usually one query for the part of the name). This process is usually repeated until the response from DNS indicates whether an IP corresponding to the queried name could be found or not.}
+
 \end{enumerate}
 
 \subsection{RPC Semantics}
@@ -309,9 +309,21 @@ server in the DNS settings, so this should not be a big issue.
 
 \subsection{Crashes}
 
-\todo{Suppose the server-side of the architecture fails by a crash of server in
-which our CertainBookStore class is run. In this context, explain the
-following.}
+\begin{enumerate}[(a)]
+\item If the server running the \textit{CertainBookStore} class were to become
+  unavailable without a proxy, a client would experience their requests timing
+  out. If a proxy server is inserted between the client and the
+  \textit{CertainBookStore}-server the client would receive a ``502 Bad
+  Gateway'' error from the proxy instead.
+\item The caching layer could be used to serve a read-only version of the
+  service in case the backend-server fails. This would enable us to mask
+  failures from clients only requiring read-access to the data provided by the
+  service. It would, however, be unusual to employ caching proxy-servers for
+  this purpose since their primary purpose is to offload repeated data accesses
+  from reaching the backend servers. They usually provide no guarantee to hold a
+  complete copy of the data provided by a service.
+\item 
+\end{enumerate}
 
 
 %\bibliographystyle{plain}
