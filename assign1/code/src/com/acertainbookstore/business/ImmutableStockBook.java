@@ -24,8 +24,8 @@ public final class ImmutableStockBook extends ImmutableBook implements
      * @param price
      * @param numCopies
      * @param SaleMisses
-     * @param TimesRated
-     * @param TotalRating
+     * @param timesRated
+     * @param totalRating
      * @param editorPick
      */
     public ImmutableStockBook(int ISBN, String title, String author,

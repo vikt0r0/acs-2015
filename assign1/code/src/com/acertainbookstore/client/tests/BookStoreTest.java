@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.junit.After;
@@ -32,6 +33,7 @@ public class BookStoreTest {
 
 	private static final int TEST_ISBN = 3044560;
 	private static final int NUM_COPIES = 5;
+    private static int isbn = 3044561;
 	private static boolean localTest = true;
 	private static StockManager storeManager;
 	private static BookStore client;
@@ -304,6 +306,99 @@ public class BookStoreTest {
 				&& booksInStorePreTest.size() == booksInStorePostTest.size());
 
 	}
+
+    /**
+     * Helper method to create a rated book
+     */
+    private StockBook getRatedBook(int isbn, int copies, double averageRating, long nRates) throws BookStoreException {
+        return new ImmutableStockBook(isbn, "Test of Thrones",
+                "George RR Testin'", (float) 10, copies, 0, nRates, Math.round(averageRating*nRates), false);
+    }
+
+    /*
+     * Helper method to create a set of books with ratings between minRating and maxRating
+     */
+    private Set<StockBook> getBooks(int n, double minRating, double maxRating, long nRates) throws BookStoreException {
+        Set<StockBook> books = new HashSet<>();
+        Random rand = new Random();
+
+        for (int i = 0; i < n; ++i) {
+            double rating =  (maxRating - minRating) * rand.nextFloat() + minRating;
+            books.add(getRatedBook(++isbn, 10, rating, nRates));
+        }
+        return books;
+    }
+
+    @Test
+    public void testGetTopRatedBooks() throws BookStoreException {
+        // Populate bookstore
+        Set<StockBook> topRatedBooks = getBooks(10, 5.0, 4.0, 10);
+        Set<StockBook> otherRatedBooks = getBooks(20, 3.0, 0.0, 10);
+        Set<StockBook> nonRatedBooks = getBooks(20, 0.0, 0.0, 0);
+        storeManager.addBooks(topRatedBooks);
+        storeManager.addBooks(otherRatedBooks);
+        storeManager.addBooks(nonRatedBooks);
+
+        List<Book> booksTopRated5, booksTopRated10;
+
+        // Get the 5 and 10 top rated books
+        try {
+            booksTopRated5 = client.getTopRatedBooks(5);
+            booksTopRated10 = client.getTopRatedBooks(10);
+
+            if (!topRatedBooks.containsAll(booksTopRated5) || !topRatedBooks.containsAll(booksTopRated10))
+                fail();
+
+        } catch (BookStoreException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testGetTopRatedBooksNonPositiveK() throws BookStoreException {
+        try {
+            client.getTopRatedBooks(0);
+            fail();
+        } catch (BookStoreException e) {
+            ;
+        }
+        try {
+            client.getTopRatedBooks(-1);
+            fail();
+        } catch (BookStoreException e) {
+            ;
+        }
+    }
+
+
+    @Test
+    public void testGetTopRatedBooksNoBooks() throws BookStoreException {
+        // Remove all books
+        storeManager.removeAllBooks();
+
+        assertTrue(client.getTopRatedBooks(5).isEmpty());
+    }
+
+    @Test
+    public void testGetTopRatedBooksNoRatedBooks() throws BookStoreException {
+        // Populate bookstore
+        Set<StockBook> nonRatedBooks = getBooks(5, 0.0, 0.0, 0);
+        storeManager.addBooks(nonRatedBooks);
+
+        assertTrue(client.getTopRatedBooks(5).isEmpty());
+    }
+
+
+    @Test
+    public void testGetTopRatedBooksLessThanKRated() throws BookStoreException {
+        // Populate bookstore
+        Set<StockBook> ratedBooks = getBooks(5, 4.0, 0.0, 10);
+        Set<StockBook> nonRatedBooks = getBooks(30, 0.0, 0.0, 0);
+        storeManager.addBooks(ratedBooks);
+        storeManager.addBooks(nonRatedBooks);
+
+        assertTrue(ratedBooks.containsAll(client.getTopRatedBooks(10)));
+    }
 
 	@AfterClass
 	public static void tearDownAfterClass() throws BookStoreException {
