@@ -179,24 +179,6 @@ will not be possible
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Programming Task}
-\subsection{Question 1: Implementation Description}
-Our implementation of the additional features an tests is fairly straight
-forward and reflects the style and structure of the code included in the
-handout.
-
-The all-or-nothing semantics are enforced by validating request data before any
-changes are performed. If any invalid input data is found which would cause the
-request to fail during execution we throw an exception to abort the execution of
-the function. This means that a change-set will either be completely applied or
-not applied at all.
-
-We have ensured that the functions that we have implemented respects the
-interface of the assignment through test cases with verifies their behavior when
-processing both valid and invalid input data. In particular, we check if the
-all-or-nothing semantics are respected by making sure that the contents of the
-book store before and after a failing test are identical.
-
 \subsection{Question 2: Techniques for Performance}
 
 \begin{enumerate}
@@ -221,7 +203,24 @@ book store before and after a failing test are identical.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Discussion on Architecture}
-\subsection{Discussion }
+\subsection{Describtion of Implementation}
+
+Our implementation of the additional features and tests is fairly straight
+forward and reflects the style and structure of the code included in the
+handout.
+
+The all-or-nothing semantics are enforced by validating request data before any
+changes are performed. If any invalid input data is found which would cause the
+request to fail during execution we throw an exception to abort the execution of
+the function. This means that a change-set will either be completely applied or
+not applied at all.
+
+We have ensured that the functions that we have implemented respects the
+interface of the assignment through test cases with verifies their behavior when
+processing both valid and invalid input data. In particular, we check if the
+all-or-nothing semantics are respected by making sure that the contents of the
+book store before and after a failing test are identical.
+
 \subsection{Modularity}
 \begin{enumerate}[(a)]
 \item{The service is implemented as an RPC architecture using the HTTP protocol
