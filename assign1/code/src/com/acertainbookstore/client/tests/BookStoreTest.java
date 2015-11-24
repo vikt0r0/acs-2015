@@ -407,12 +407,12 @@ public class BookStoreTest {
     @Test
     public void testUpdateRating() throws BookStoreException {
         // Add some books before we begin
-		StockBook b1 = getBook(isbn++, 10, 0, 0),
-				  b2 = getBook(isbn++, 10, 0, 0);
+        StockBook b1 = getBook(isbn++, 10, 0, 0),
+            b2 = getBook(isbn++, 10, 0, 0);
 
         Set<StockBook> booksToAdd = new HashSet<StockBook>();
         booksToAdd.add(b1);
-		booksToAdd.add(b2);
+        booksToAdd.add(b2);
 
         storeManager.addBooks(booksToAdd);
 
@@ -426,11 +426,15 @@ public class BookStoreTest {
 
         // Check that the ratings had the intended effect
         List<StockBook> books = storeManager.getBooks();
-		StockBook b1Rated = books.stream().filter(b -> b.equals(b1)).collect(Collectors.toList()).get(0);
-		StockBook b2Rated = books.stream().filter(b -> b.equals(b2)).collect(Collectors.toList()).get(0);
 
-		assertEquals(b1,b1Rated);
-		assertEquals(b2,b2Rated);
+        StockBook b1Rated = books.stream().filter(b -> b.equals(b1)).
+            collect(Collectors.toList()).get(0);
+        StockBook b2Rated = books.stream().filter(b -> b.equals(b2)).
+            collect(Collectors.toList()).get(0);
+
+        assertEquals(b1,b1Rated);
+        assertEquals(b2,b2Rated);
+
     }
 
 
