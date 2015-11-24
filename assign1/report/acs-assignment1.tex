@@ -114,7 +114,9 @@ to be in an erronous state or unavailable. If the central server is down, it
 will not be possible
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item Here we show pseudocode for the API
+\item Here we show pseudocode for the API. For simplicity we one handle
+  \emph{one} byte a time. So storing a double could result in placing parts on
+  two machines (if you client doesn't align properly).
 
 \todo{Write some more text}
 
