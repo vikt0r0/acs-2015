@@ -281,9 +281,7 @@ public class CertainBookStore implements BookStore, StockManager {
             b -> b.immutableStockBook()
         ).collect(Collectors.toList());
 
-        List<Book> topRated = listBooks.subList(0, numBooks > listBooks.size() ? listBooks.size() : numBooks);
-
-        return topRated;
+        return listBooks.subList(0, numBooks > listBooks.size() ? listBooks.size() : numBooks);
     }
 
     @Override
