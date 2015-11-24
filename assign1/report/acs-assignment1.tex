@@ -198,6 +198,7 @@ The all-or-nothing semantics are enforced by
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \section{Discussion on Architecture}
 \subsection{Discussion }
 \subsection{Modularity}
@@ -235,18 +236,18 @@ The all-or-nothing semantics are enforced by
 
 \item{Among other services, DNS provides name-to-IP address translation for
     TCP/IP. DNS is implemented with a multi-level, hierarchical structure.  For
-    instance, }
+    instance, \todo{for instance what?} }
 \end{enumerate}
 
 
-\subsection{Question 4: RPC Semantics}
+\subsection{RPC Semantics}
 
 The semantics of RPC used for \texttt{acertainbookstore.com} is ``at most
 once''. This means the request from the client is at most executed once on the
 server side, and if any errors occur they are exposed to the client.
 
 
-\subsection{Question 5: HTTP Proxy Servers}
+\subsection{HTTP Proxy Servers}
 
 The usual approach to using proxy servers to increase the number of simultaneous
 users, is to make the proxy handle all incoming connections, and distribute the
@@ -264,7 +265,7 @@ the database becomes a bottleneck, but it has greatly improved the situation
 from having just one machine.\footnote{and also gives you lots of features for
   handling fault tolerance for free}.
 
-\subsection{Question 6: Scalability}
+\subsection{Scalability}
 
 As outlined above, the current setup does not facilitate running the server on
 more than one machine at once, so besides upgrading the CPU to having many
@@ -277,6 +278,13 @@ infinitely scalability.
 
 If a single proxy server becomes a bottleneck, one can simply add an other proxy
 server in the DNS settings, so this should not be a big issue.
+
+\subsection{Crashes}
+
+\todo{Suppose the server-side of the architecture fails by a crash of server in
+which our CertainBookStore class is run. In this context, explain the
+following.}
+
 
 %\bibliographystyle{plain}
 %\bibliography{references}
