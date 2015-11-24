@@ -1,0 +1,16 @@
+% !TEX root = ../acs-assignment1.tex
+\subsection{Modularity}
+\begin{enumerate}[(a)]
+\item{The service is implemented as an RPC architecture using the HTTP protocol as its transport. The architecture is modular as clients are isolated from each other and use the API defined by the method stubs implemented in client libraries for communication. The client library and service handlers are responsible for encoding and marshaling request data and responses.}
+
+\item{The service and the client reside in different address spaces on (most likely) different systems. This provides a high degree of isolation and entails reduced fate-sharing, should an error occur on either.}
+
+\item{Instances of Java programs are run in their own JVM instance each belonging to a separate process with (presumably) separate address spaces. The degree of isolation is thus, to some extent, determined by the semantics of the the process abstraction of the host OS . In this sense, the client and service remain isolated when run locally, however the degree of fate-sharing is higher, as both will fail should the system on which they are both running fail.}
+\end{enumerate}
+
+\subsection{Naming mechanism}
+\begin{enumerate}[(a)]
+\item{Several naming mechanisms are used by the architecture at multiple levels. These are either directly visible or available from the abstractions used by the service. On a data-level, an ISBN, for instance, uniquely identifies a book. On an architectural level, the BookStore service uses HTTP over TCP/IP for its transport, meaning that domain names can be used to refer to a BookStore service provider instance using DNS. On an even lower level, the name-to-IP translation provided by DNS itself as well as t relies on another naming schemes,  IP addresses}
+
+\item{Given a hostname, DNS can be queried DNS is implemented with a multi-level, hierarchal structure. For instance, }
+\end{enumerate}
