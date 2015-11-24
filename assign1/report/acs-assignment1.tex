@@ -177,6 +177,24 @@ once''. This means the request from the client is at most executed once on the
 server side, and if any errors occur they are exposed to the client.
 
 
+\subsection{Question 5: HTTP Proxy Servers}
+
+The usual approach to using proxy servers to increase the number of simultaneous
+users, is to make the proxy handle all incoming connections, and distribute the
+work between ``worker'' machines (ie. by round-robin).
+
+The current setup stored the book data directly in memory, and concurrent
+modifications are handled using threads, which limits the uses to a
+\emph{single} (possibly multicore) machine.
+
+In our opinion the easiest way to enable scalability would be to move the data
+into a database, that every worker machine would connect to. Then we can use a
+proxy server as the entry point for HTTP requests, which forwards requests to a
+\texttt{BookStoreHTTPServer} on some ``worker'' machine. This of course means
+the database becomes a bottleneck, but it has greatly improved the situation
+from having just one machine.\footnote{and also gives you lots of features for
+  handling fault tolerance for free}.
+
 %\bibliographystyle{plain}
 %\bibliography{references}
 
