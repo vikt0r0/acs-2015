@@ -437,6 +437,31 @@ public class BookStoreTest {
 
     }
 
+    /**
+     * Tests that rateBooks returns an exception when called with a
+     * non-existing book
+     */
+    @Test
+    public void testRateInvalidISBN() throws BookStoreException {
+        List<StockBook> preTestBooks = storeManager.getBooks();
+
+        HashSet<BookRating> rateBooks = new HashSet<BookRating>();
+        rateBooks.add(new BookRating(-1, 5));
+
+        try {
+            client.rateBooks(rateBooks);
+            fail();
+        } catch (BookStoreException ex) {
+            ;
+        }
+
+        // Make sure that ratings were unaffected
+        List<StockBook> postTestBooks = storeManager.getBooks();
+        assertTrue(preTestBooks.containsAll(postTestBooks)
+                   && preTestBooks.size() == postTestBooks.size());
+
+    }
+
 
     /**
      * Tests that rateBooks returns an exception when called with a
