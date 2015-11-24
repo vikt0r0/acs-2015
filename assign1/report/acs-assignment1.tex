@@ -230,14 +230,20 @@ The all-or-nothing semantics are enforced by
     over TCP/IP for its transport, meaning that domain names can be used to
     refer to a BookStore service provider instance. On an even lower level, the
     name-to-IP translation (provided by DNS) itself as well as all communication
-    using TCP/IP relies on another naming schemes IP addresses, that refer to
-    the network interface of a system connected to the internet.}
+    using TCP/IP relies on another naming scheme, namely IP addresses with each IP corresponding to the network interface of a system connected to the internet.}
 
-\item{Among other services, DNS provides name-to-IP address translation for
-    TCP/IP. DNS is implemented with a multi-level, hierarchical structure.  For
-    instance, }
+\item{DNS (along with other services) provides name-to-IP address translation for
+    TCP/IP. DNS translation is implemented as a multi-level, recursive lookup scheme in which different parts of a domain name corresponds to a different level of the DNS hierarchy. This is depicted in Figure \ref{fig:dns}.
+    
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/dns.png}
+    \caption{DNS hierarchy. Lower levels correspond to more specific names.}
+    \label{fig:dns}
+\end{figure}
+
+For instance, in order to resolve the name \url{service.bookstore.com.}, the root node (at the top-level of the hierarchy; corresponding to the rightmost "\url{.}" of the name) is first queried in order to determine what node in the next level of the DNS hierarchy is responsible for address translation of the next part of the domain, i.e. "\url{.com}". DNS then directs the client to query this node for name-to-IP-translation recursively. This process is usually repeated until the response from DNS indicates whether an IP corresponding to the query name could be found or not.}
 \end{enumerate}
-
 
 \subsection{Question 4: RPC Semantics}
 
