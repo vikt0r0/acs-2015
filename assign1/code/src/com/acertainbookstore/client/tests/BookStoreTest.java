@@ -79,6 +79,28 @@ public class BookStoreTest {
 				"JK Unit", (float) 10, NUM_COPIES, 0, 0, 0, false);
 	}
 
+    /**
+     * Helper method to create a rated book
+     */
+    private StockBook getBook(int isbn, int copies, double averageRating, long nRates) throws BookStoreException {
+        return new ImmutableStockBook(isbn, "Test of Thrones",
+                "George RR Testin'", (float) 10, copies, 0, nRates, Math.round(averageRating*nRates), false);
+    }
+
+    /*
+     * Helper method to create a set of books with ratings between minRating and maxRating
+     */
+    private Set<StockBook> getBooks(int n, double minRating, double maxRating, long nRates) throws BookStoreException {
+        Set<StockBook> books = new HashSet<>();
+        Random rand = new Random();
+
+        for (int i = 0; i < n; ++i) {
+            double rating =  (maxRating - minRating) * rand.nextFloat() + minRating;
+            books.add(getBook(++isbn, 10, rating, nRates));
+        }
+        return books;
+    }
+
 	/**
 	 * Method to add a book, executed before every test case is run
 	 */
@@ -307,28 +329,6 @@ public class BookStoreTest {
 
 	}
 
-    /**
-     * Helper method to create a rated book
-     */
-    private StockBook getRatedBook(int isbn, int copies, double averageRating, long nRates) throws BookStoreException {
-        return new ImmutableStockBook(isbn, "Test of Thrones",
-                "George RR Testin'", (float) 10, copies, 0, nRates, Math.round(averageRating*nRates), false);
-    }
-
-    /*
-     * Helper method to create a set of books with ratings between minRating and maxRating
-     */
-    private Set<StockBook> getBooks(int n, double minRating, double maxRating, long nRates) throws BookStoreException {
-        Set<StockBook> books = new HashSet<>();
-        Random rand = new Random();
-
-        for (int i = 0; i < n; ++i) {
-            double rating =  (maxRating - minRating) * rand.nextFloat() + minRating;
-            books.add(getRatedBook(++isbn, 10, rating, nRates));
-        }
-        return books;
-    }
-
     @Test
     public void testGetTopRatedBooks() throws BookStoreException {
         // Populate bookstore
@@ -341,17 +341,12 @@ public class BookStoreTest {
 
         List<Book> booksTopRated5, booksTopRated10;
 
-        // Get the 5 and 10 top rated books
-        try {
-            booksTopRated5 = client.getTopRatedBooks(5);
-            booksTopRated10 = client.getTopRatedBooks(10);
+        // Both values for < k and == k should work
+        booksTopRated5 = client.getTopRatedBooks(5);
+        booksTopRated10 = client.getTopRatedBooks(10);
 
-            if (!topRatedBooks.containsAll(booksTopRated5) || !topRatedBooks.containsAll(booksTopRated10))
-                fail();
-
-        } catch (BookStoreException e) {
+        if (!topRatedBooks.containsAll(booksTopRated5) || !topRatedBooks.containsAll(booksTopRated10))
             fail();
-        }
     }
 
     @Test
