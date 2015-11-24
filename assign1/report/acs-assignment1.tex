@@ -173,8 +173,41 @@ from an address that you issued the last successful \texttt{WRITE} to will give 
 \subsection{Question 4: RPC Semantics}
 
 The semantics of RPC used for \texttt{acertainbookstore.com} is ``at most
-once''. This means the request from the clinet is at most executed once on the
-server side, and if any erros occur they are exposed to the client.
+once''. This means the request from the client is at most executed once on the
+server side, and if any errors occur they are exposed to the client.
+
+
+\subsection{Question 5: HTTP Proxy Servers}
+
+The usual approach to using proxy servers to increase the number of simultaneous
+users, is to make the proxy handle all incoming connections, and distribute the
+work between ``worker'' machines (ie. by round-robin).
+
+The current setup stored the book data directly in memory, and concurrent
+modifications are handled using threads, which limits the uses to a
+\emph{single} (possibly multicore) machine.
+
+In our opinion the easiest way to enable scalability would be to move the data
+into a database, that every worker machine would connect to. Then we can use a
+proxy server as the entry point for HTTP requests, which forwards requests to a
+\texttt{BookStoreHTTPServer} on some ``worker'' machine. This of course means
+the database becomes a bottleneck, but it has greatly improved the situation
+from having just one machine.\footnote{and also gives you lots of features for
+  handling fault tolerance for free}.
+
+\subsection{Question 6: Scalability}
+
+As outlined above, the current setup does not facilitate running the server on
+more than one machine at once, so besides upgrading the CPU to having many
+cores, there is not much to do.
+
+By employing a database, the database becomes the bottleneck. However, databases
+can also be run distributed over more than one machine to improve
+performance. Even though this helps, it is not a silver bullet to allow
+infinitely scalability.
+
+If a single proxy server becomes a bottleneck, one can simply add an other proxy
+server in the DNS settings, so this should not be a big issue.
 
 %\bibliographystyle{plain}
 %\bibliography{references}
