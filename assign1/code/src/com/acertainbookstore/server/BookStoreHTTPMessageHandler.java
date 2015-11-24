@@ -243,6 +243,22 @@ public class BookStoreHTTPMessageHandler extends AbstractHandler {
                 response.getWriter().println(listBooksxmlString);
                 break;
 
+            case GETTOPRATEDBOOKS:
+                numBooksString = URLDecoder.decode(request.getParameter(BookStoreConstants.BOOK_NUM_PARAM), "UTF-8");
+                bookStoreResponse = new BookStoreResponse();
+                try {
+                    numBooks = BookStoreUtility
+                            .convertStringToInt(numBooksString);
+                    bookStoreResponse.setList(myBookStore
+                            .getTopRatedBooks(numBooks));
+                } catch (BookStoreException ex) {
+                    bookStoreResponse.setException(ex);
+                }
+                listBooksxmlString = BookStoreUtility
+                        .serializeObjectToXMLString(bookStoreResponse);
+                response.getWriter().println(listBooksxmlString);
+                break;
+
             default:
                 System.out.println("Unhandled message tag");
                 break;
