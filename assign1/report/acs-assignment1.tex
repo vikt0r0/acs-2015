@@ -252,9 +252,12 @@ book store before and after a failing test are identical.
     name-to-IP translation (provided by DNS) itself as well as all communication
     using TCP/IP relies on another naming scheme, namely IP addresses. In this scheme each IP corresponds to a network interface of a system connected to the internet.}
 
-\item{DNS (along with other services) provides name-to-IP address translation for
-    TCP/IP. DNS translation is implemented as a multi-level, recursive lookup scheme in which different parts of a domain name corresponds to a different level of the DNS hierarchy. This is depicted in Figure \ref{fig:dns}.
-    
+\item{DNS (along with other services) provides name-to-IP address translation
+    for TCP/IP. DNS translation is implemented as a multi-level, recursive
+    lookup scheme in which different parts of a domain name corresponds to a
+    different level of the DNS hierarchy. This is depicted in Figure
+    \ref{fig:dns}.
+
 \begin{figure}[!hbt]
     \centering
     \includegraphics[width=0.6\textwidth]{img/dns.png}
@@ -262,7 +265,14 @@ book store before and after a failing test are identical.
     \label{fig:dns}
 \end{figure}
 
-For instance, in order to resolve the name \url{service.bookstore.com.}, the root node (at the top-level of the hierarchy; corresponding to the rightmost "\url{.}" of the name) is first queried in order to determine what node in the next level of the DNS hierarchy is responsible for address translation of the next part of the domain, i.e. "\url{.com}". DNS then directs the client to query this node for name-to-IP-translation recursively. This process is usually repeated until the response from DNS indicates whether an IP corresponding to the query name could be found or not.}
+For instance, in order to resolve the name \url{service.bookstore.com.}, the
+root node (at the top-level of the hierarchy; corresponding to the rightmost
+``\url{.}'' of the name) is first queried in order to determine what node in the
+next level of the DNS hierarchy is responsible for address translation of the
+next part of the domain, i.e. ``\url{.com}''. DNS then directs the client to
+query this node for name-to-IP-translation recursively. This process is usually
+repeated until the response from DNS indicates whether an IP corresponding to
+the query name could be found or not.}
 \end{enumerate}
 
 \subsection{RPC Semantics}
