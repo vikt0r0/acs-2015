@@ -320,7 +320,8 @@ server in the DNS settings, so this should not be a big issue.
   this purpose since their primary purpose is to offload repeated data accesses
   from reaching the backend servers. They usually provide no guarantee to hold a
   complete copy of the data provided by a service.
-\item 
+\item The semantics of the service are changed such that only read-requests are
+  allowed. 
 \end{enumerate}
 
 
