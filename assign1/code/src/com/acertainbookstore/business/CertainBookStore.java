@@ -274,10 +274,14 @@ public class CertainBookStore implements BookStore, StockManager {
             throw new BookStoreException("numBooks = " + numBooks + ", but it must be positive");
 
         List<Book> listBooks = bookMap.values().stream().sorted(
-                (b1,b2) -> Double.compare(b2.getAverageRating(), b1.getAverageRating())
-        ).map(b -> b.immutableBook()).collect(Collectors.toList());
+            (b1,b2) -> Double.compare(b2.getAverageRating(), b1.getAverageRating())
+        ).filter(
+            b -> b.getTimesRated() > 0
+        ).map(
+            b -> b.immutableStockBook()
+        ).collect(Collectors.toList());
 
-        return listBooks.subList(0, numBooks);
+        return listBooks.subList(0, numBooks > listBooks.size() ? listBooks.size() : numBooks);
     }
 
     @Override

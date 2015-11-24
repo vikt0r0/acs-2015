@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.junit.After;
@@ -33,6 +34,7 @@ public class BookStoreTest {
 
     private static final int TEST_ISBN = 3044560;
     private static final int NUM_COPIES = 5;
+    private static int isbn = 3044561;
     private static boolean localTest = true;
     private static StockManager storeManager;
     private static BookStore client;
@@ -64,17 +66,18 @@ public class BookStoreTest {
      */
     public void addBooks(int isbn, int copies) throws BookStoreException {
         Set<StockBook> booksToAdd = new HashSet<StockBook>();
-        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 1,
-                                              "The Art of Computer Programming",
-                                              "Donald Knuth", (float) 300,
-                                              NUM_COPIES, 0, 0, 0, false));
-        booksToAdd.add(new ImmutableStockBook(TEST_ISBN + 2,
-                                              "The C Programming Language",
-                                              "Dennis Ritchie and Brian Kerninghan",
-                                              (float) 50, NUM_COPIES,
-                                              0, 0, 0, false));
-
+        StockBook book = new ImmutableStockBook(isbn, "Test of Thrones",
+                "George RR Testin'", (float) 10, copies, 0, 0, 0, false);
+        booksToAdd.add(book);
         storeManager.addBooks(booksToAdd);
+    }
+
+    /**
+     * Helper method to get the default book used by initializeBooks
+     */
+    public StockBook getDefaultBook() {
+        return new ImmutableStockBook(TEST_ISBN, "Harry Potter and JUnit",
+                "JK Unit", (float) 10, NUM_COPIES, 0, 0, 0, false);
     }
 
     /**
@@ -82,9 +85,24 @@ public class BookStoreTest {
      *
      * @return
      */
-    public StockBook getDefaultBook() {
-        return new ImmutableStockBook(TEST_ISBN, "Harry Potter and JUnit",
-                "JK Unit", (float) 10, NUM_COPIES, 0, 0, 0, false);
+
+    private StockBook getBook(int isbn, int copies, double averageRating, long nRates) throws BookStoreException {
+        return new ImmutableStockBook(isbn, "Test of Thrones",
+                "George RR Testin'", (float) 10, copies, 0, nRates, Math.round(averageRating*nRates), false);
+    }
+
+    /*
+     * Helper method to create a set of books with ratings between minRating and maxRating
+     */
+    private Set<StockBook> getBooks(int n, double minRating, double maxRating, long nRates) throws BookStoreException {
+        Set<StockBook> books = new HashSet<>();
+        Random rand = new Random();
+
+        for (int i = 0; i < n; ++i) {
+            double rating =  (maxRating - minRating) * rand.nextFloat() + minRating;
+            books.add(getBook(++isbn, 10, rating, nRates));
+        }
+        return books;
     }
 
     /**
@@ -281,7 +299,7 @@ public class BookStoreTest {
         // Get books with that ISBN
 
         List<Book> books = client.getBooks(isbnList);
-        // Make sure the lists equal each otherq
+        // Make sure the lists equal each other
         assertTrue(books.containsAll(booksToAdd)
                 && books.size() == booksToAdd.size());
 
@@ -313,6 +331,72 @@ public class BookStoreTest {
         assertTrue(booksInStorePreTest.containsAll(booksInStorePostTest)
                 && booksInStorePreTest.size() == booksInStorePostTest.size());
 
+    }
+
+    @Test
+    public void testGetTopRatedBooks() throws BookStoreException {
+        // Populate bookstore
+        Set<StockBook> topRatedBooks = getBooks(10, 5.0, 4.0, 10);
+        Set<StockBook> otherRatedBooks = getBooks(20, 3.0, 0.0, 10);
+        Set<StockBook> nonRatedBooks = getBooks(20, 0.0, 0.0, 0);
+        storeManager.addBooks(topRatedBooks);
+        storeManager.addBooks(otherRatedBooks);
+        storeManager.addBooks(nonRatedBooks);
+
+        List<Book> booksTopRated5, booksTopRated10;
+
+        // Both values for < k and == k should work
+        booksTopRated5 = client.getTopRatedBooks(5);
+        booksTopRated10 = client.getTopRatedBooks(10);
+
+        if (!topRatedBooks.containsAll(booksTopRated5) || !topRatedBooks.containsAll(booksTopRated10))
+            fail();
+    }
+
+    @Test
+    public void testGetTopRatedBooksNonPositiveK() throws BookStoreException {
+        try {
+            client.getTopRatedBooks(0);
+            fail();
+        } catch (BookStoreException e) {
+            ;
+        }
+        try {
+            client.getTopRatedBooks(-1);
+            fail();
+        } catch (BookStoreException e) {
+            ;
+        }
+    }
+
+
+    @Test
+    public void testGetTopRatedBooksNoBooks() throws BookStoreException {
+        // Remove all books
+        storeManager.removeAllBooks();
+
+        assertTrue(client.getTopRatedBooks(5).isEmpty());
+    }
+
+    @Test
+    public void testGetTopRatedBooksNoRatedBooks() throws BookStoreException {
+        // Populate bookstore
+        Set<StockBook> nonRatedBooks = getBooks(5, 0.0, 0.0, 0);
+        storeManager.addBooks(nonRatedBooks);
+
+        assertTrue(client.getTopRatedBooks(5).isEmpty());
+    }
+
+
+    @Test
+    public void testGetTopRatedBooksLessThanKRated() throws BookStoreException {
+        // Populate bookstore
+        Set<StockBook> ratedBooks = getBooks(5, 4.0, 0.0, 10);
+        Set<StockBook> nonRatedBooks = getBooks(30, 0.0, 0.0, 0);
+        storeManager.addBooks(ratedBooks);
+        storeManager.addBooks(nonRatedBooks);
+
+        assertTrue(ratedBooks.containsAll(client.getTopRatedBooks(10)));
     }
 
     /**
@@ -386,7 +470,7 @@ public class BookStoreTest {
                    && preTestBooks.size() == postTestBooks.size());
 
     }
-    
+
     @AfterClass
     public static void tearDownAfterClass() throws BookStoreException {
         storeManager.removeAllBooks();
@@ -395,5 +479,5 @@ public class BookStoreTest {
             ((StockManagerHTTPProxy) storeManager).stop();
         }
     }
-
+    
 }
