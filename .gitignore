@@ -13,3 +13,6 @@
 *.blg
 *.run.xml
 *_region_.tex
+
+# Eclipse
+workbench.xmi
