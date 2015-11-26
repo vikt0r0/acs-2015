@@ -98,8 +98,7 @@
 The naming scheme consists of issuing READ/WRITE request to a central server,
 which looks up what intervals of the memory map to which machines. The lookup
 function is implemented with a table. A name identifying the machine is returned
-to the client, which in turn issues the request to machine holding the requested
-data.
+to the client, which in turn issues the request recursively to the machine holding the requested data.
 
 The design is scalable in the sense that adding a machine machine, $m_{K+1}$,
 to the array essentially means adding a table entry with the interval
@@ -110,8 +109,8 @@ This increases the range of valid addresses by $n_{k+1}$.
 Client-machine communication is assumed to facilitate positive acknowledgments
 with retransmissions for requests. In the case a request can not be properly
 delivered, the central server or machine holding the requested data is assumed
-to be in an erronous state or unavailable. If the central server is down, it
-will not be possible
+to be in an erroneous state or unavailable. If the central server is down, it
+will not be possible to access any of the machines. This leads to several concerns regarding how to ensure the availability of the service.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \item Here we show pseudocode for the memory API. For simplicity we one handle
@@ -199,9 +198,34 @@ will not be possible
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Discussion on Architecture}
-\subsection{Description of Implementatiom}
 
+\section{Tests}
+Tests were implemented for all added features. All tests pass and will briefly be described in the following:
+\paragraph{Test for \texttt{getBooksInDemand}}
+\begin{enumerate}
+\item{\texttt{testGetBooksInDemand()} tests all aspects.}
+\end{enumerate}
+
+\paragraph{Test for \texttt{rateBooks}}
+\begin{enumerate}
+\item{\texttt{testUpdateRating()} tests whether book ratings are updated properly.}
+\item{\texttt{testRateBooksAllOrNothing()} tests whether all-or-nothing semantics are respected when book ratings are updated.}
+\item{\texttt{testRateBooksInvalidISBN()} tests whether ISBN is validated properly.}
+\item{\texttt{testRateBooksNonExistingISBN()} test that it is impossible to rate a book that does not exits.}
+\item{\texttt{testRateBooksNonExistingISBN()} test that it is impossible to rate with an invalid rating.}
+\end{enumerate}
+
+\paragraph{Test for \texttt{getTopRatedBooks}}
+\begin{enumerate}
+\item{\texttt{testGetTopRatedBooks()} tests if the function works under normal circumstances.}
+\item{\texttt{testGetTopRatedBooksNonPositiveK()} tests when the function is used with a non-positive k.}
+\item{\texttt{testGetTopRatedBooksNoBooks()} tests behaviour when no books are present.}
+\item{\texttt{testGetTopRatedBooksNoRatedBooks()} tests behaviour when no books are present in the bookstore.}
+\item{\texttt{testGetTopRatedBooksLessThanKRated()} test behaviour when there are less than k books rated.}
+\end{enumerate}
+
+\section{Discussion on Architecture}
+\subsection{Description of Implementation}
 Our implementation of the additional features and tests is fairly straight
 forward and reflects the style and structure of the code included in the
 handout.
