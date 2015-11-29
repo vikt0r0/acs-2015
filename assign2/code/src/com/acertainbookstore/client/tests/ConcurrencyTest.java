@@ -147,4 +147,57 @@ public class ConcurrencyTest {
         storeManager.removeAllBooks();
     }
 
+    @Test
+    public void fixedIterationsTest2() throws BookStoreException {
+        fixedIterations2(10000);
+    }
+
+    private void fixedIterations2(final int iterations) throws BookStoreException {
+        storeManager.addBooks(toAdd);
+
+        final int copies = 8 + 4 + 3;
+
+        for(int i = 0; i < iterations; i++) {
+            storeManager.addCopies(toBuy);
+        }
+
+        List<StockBook> initialBooks = storeManager.getBooks();
+        final int preTestCount = initialBooks.size();
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        Future<Boolean> buySellFuture = executor.submit(new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    for (int i = 0; i < iterations; i++) {
+                        // Buy first and them immediatley add books
+                        client.buyBooks(toBuy);
+                        storeManager.addCopies(toBuy);
+                    }
+                    return true;
+                }
+            });
+
+        // Future for verifying that the number of books, at any time, is equal
+        // to either before - copies or before
+        Future<Boolean> checkFuture = executor.submit(new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    Boolean res = true;
+                    for (int i = 0; i < iterations; i++) {
+                        int curCount = storeManager.getBooks().size();
+                        res &= (curCount == preTestCount ||
+                                curCount == preTestCount - copies);
+                    }
+                    return res;
+                }
+            });
+
+        try {
+            buySellFuture.get();
+            assertTrue(checkFuture.get());
+        } catch(Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
 }
