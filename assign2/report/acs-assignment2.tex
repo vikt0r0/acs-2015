@@ -88,8 +88,49 @@
 
 
 \subsection{Questions 2: Optimistic Concurrency Control}
+In the Kung-Robinson optimistic concurrency model, we have to consider intersections of overlapping read and write sets, $R_{i}$ and $W_{i}$ respectively, for all transactions $T_{i}$. A non-empty intersection semantically corresponds to possible RAW, WAR and WAW conflicts/dependencies, i.e. if the same location is accessed by two different transactions and at least one of the accesses is a write. 
+
+
 \paragraph{Scenario 1}
-\paragraph{Scenario 2}
+We will consider the intersection of all read and write sets that involve $T_{3}$, with a few restrictions. We know that (1) $T_{1}$ completes before $T_{3}$ begins with its write phase and (2) $T_{2}$ completes read phase before $T_{3}$ does. This means $R_{1} \cap W_{3} = \emptyset$, $W_{1} \cap R_{3} = \emptyset$, $W_{1} \cap W_{3} = \emptyset$ and $R_{2} \cap W_{3} = \emptyset$, $W_{2} \cap W_{3} = \emptyset$ as these read/write sets are guaranteed to not overlap. The intersections are depicted in Table \ref{tbl:scenario1}:
+\begin{table}[!hbt]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$\cap$  & $W_{1}$ & $W_{2}$ & $W_{3}$    \\ \hline
+$R_{1}$ & x  & x  & $\emptyset$ \\ \hline
+$R_{2}$ & x  & x  & $\emptyset$ \\ \hline
+$R_{3}$ & $\emptyset$ & $\left\{ 4 \right\}$ & x \\ \hline
+$W_{1}$ & x  & x  & $\emptyset$ \\ \hline
+$W_{2}$ & x  & x  & $\emptyset$ \\ \hline
+$W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
+\end{tabular}
+\caption{Intersections of all $R_{i}$ and $W_{i}$ that overlap and involve $T_{3}$.}
+\label{tbl:scenario1}
+\end{table}
+
+In the case that $T_{2}$ writes element $4$ after $T_{3}$ has read element $4$, $T_{3}$ will have to perform a rollback, as RAW dependency is violated. In the case where $T_{2}$ writes element $4$ before $T_{3}$ reads element $4$, $T_{3}$ can commit.
+
+\paragraph{Scenario 2} In this case, it is given that (1) $T_{1}$ completes before $T_{3}$ begins its write phase and (2) $T_{2}$ completes its read phase before $T_{3}$ begins its read phase. This means that $W_{1} \cap W_{3} = \emptyset$, $R_{1} \cap W_{3} = \emptyset$, $R_{2} \cap W_{3} = \emptyset$, 
+\begin{table}[!hbt]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$\cap$  & $W_{1}$ & $W_{2}$ & $W_{3}$    \\ \hline
+$R_{1}$ & x  & x  & $\emptyset$ \\ \hline
+$R_{2}$ & x  & x  & $\emptyset$ \\ \hline
+$R_{3}$ & $\left\{ 3 \right\}$ & $\emptyset$ & x \\ \hline
+$W_{1}$ & x  & x  & $\emptyset$ \\ \hline
+$W_{2}$ & x  & x  & $\emptyset$ \\ \hline
+$W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
+\end{tabular}
+\caption{Intersections of all $R_{i}$ and $W_{i}$ that overlap and involve $T_{3}$.}
+\label{tbl:scenario1}
+\end{table}
+
+In the case, $T_{1}$ writes element $3$ after $T_{3}$ has read element $3$, $T_{3}$ will have to perform a rollback, as RAW dependency is violated. In the case where $T_{1}$ writes element $3$ before $T_{3}$ reads element $3$, $T_{3}$ can commit.
+
+
 \paragraph{Scenario 3}
 
 \section{Programming Assignments}
