@@ -6,6 +6,7 @@ import com.acertainbookstore.business.BookCopy;
 import com.acertainbookstore.business.ConcurrentCertainBookStore;
 import com.acertainbookstore.business.ImmutableStockBook;
 import com.acertainbookstore.business.StockBook;
+import com.acertainbookstore.business.BookEditorPick;
 import com.acertainbookstore.client.BookStoreHTTPProxy;
 import com.acertainbookstore.client.StockManagerHTTPProxy;
 import com.acertainbookstore.interfaces.BookStore;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.concurrent.*;
 
 public class ConcurrencyTest {
@@ -54,6 +56,8 @@ public class ConcurrencyTest {
 
         toAdd = new HashSet<>();
         toBuy = new HashSet<>();
+        setEditorPick = new HashSet<>();
+        removeEditorPick = new HashSet<>();
 
         int copies; int isbn;
         copiesOfIsbn = new HashMap<Integer, Integer>();
@@ -62,20 +66,29 @@ public class ConcurrencyTest {
         copiesOfIsbn.put(isbn, copies);
         toAdd.add(new ImmutableStockBook(isbn, "Star Wars 1", "Georg Lucas", .42f, copies, 0, 0, 0, false));
         toBuy.add(new BookCopy(isbn, copies));
+        setEditorPick.add(new BookEditorPick(isbn, true));
+        removeEditorPick.add(new BookEditorPick(isbn, false));
 
         isbn++; copies = 4;
         copiesOfIsbn.put(isbn, copies);
         toAdd.add(new ImmutableStockBook(isbn, "Star Wars 2", "Georg Lucas", .43f, copies, 0, 0, 0, false));
         toBuy.add(new BookCopy(isbn, copies));
+        setEditorPick.add(new BookEditorPick(isbn, true));
+        removeEditorPick.add(new BookEditorPick(isbn, false));
 
         isbn++; copies = 3;
         copiesOfIsbn.put(isbn, copies);
         toAdd.add(new ImmutableStockBook(isbn, "Star Wars 2", "Georg Lucas", .44f, copies, 0, 0, 0, false));
         toBuy.add(new BookCopy(isbn, copies));
+        setEditorPick.add(new BookEditorPick(isbn, true));
+        removeEditorPick.add(new BookEditorPick(isbn, false));
+
     }
 
     private static Set<StockBook> toAdd;
     private static Set<BookCopy> toBuy;
+    private static Set<BookEditorPick> setEditorPick;
+    private static Set<BookEditorPick> removeEditorPick;
 
     /**
      * executed before every test case is run
@@ -94,7 +107,7 @@ public class ConcurrencyTest {
 
     @Test
     public void fixedIterationTest() throws BookStoreException {
-        fixedIterations(100000);
+        fixedIterations(1000000);
     }
 
     /**
@@ -155,7 +168,7 @@ public class ConcurrencyTest {
 
     @Test
     public void untilSuccessTest() throws BookStoreException {
-        untilSuccessTestImpl(10000);
+        untilSuccessTestImpl(1000000);
     }
 
     private void untilSuccessTestImpl(final int passes) throws BookStoreException {
@@ -167,7 +180,6 @@ public class ConcurrencyTest {
                              (book.getISBN(), book.getNumCopies()));
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
-
         Future<Boolean> buySellFuture = executor.submit(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     for(;;) {
@@ -178,7 +190,7 @@ public class ConcurrencyTest {
             });
 
         // Future for verifying that the number of copies of books, at any time,
-        // is either the original number of copies or 
+        // is either the original number of copies or
         Future<Boolean> checkFuture = executor.submit(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     int mypasses = passes;
@@ -210,6 +222,123 @@ public class ConcurrencyTest {
             e.printStackTrace();
             fail();
         }
+    }
+
+    @Test
+    public void editorPicksAtomicTest() throws BookStoreException {
+        editorPicksAtomicTestImpl(100000);
+    }
+
+    private void editorPicksAtomicTestImpl(int count) throws BookStoreException {
+        storeManager.addBooks(toAdd);
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<Boolean> updatePickFuture = executor.submit(new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    for(;;) {
+                        storeManager.updateEditorPicks(setEditorPick);
+                        storeManager.updateEditorPicks(removeEditorPick);
+                    }
+                }
+            });
+
+        Future<Boolean> verifyPickFuture = executor.submit(new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    int mycount = count;
+                    boolean s1 = true;
+                    boolean s2 = false;
+                    while(mycount > 0) {
+                        List<StockBook> books = storeManager.getBooks();
+                        for(StockBook book : books) {
+                            // s1 will end up true if all books are editors pick
+                            s1 &= book.isEditorPick();
+                        }
+                        for(StockBook book : books) {
+                            // s2 will end up false if all books are NOT editors pick
+                            s2 |= book.isEditorPick();
+                        }
+                        if(!s1 || s2) {
+                            updatePickFuture.cancel(true);
+                            return false;
+                        }
+                    }
+                    updatePickFuture.cancel(true);
+                    return true;
+                }});
+
+
+        try {
+            updatePickFuture.get();
+            assertTrue(verifyPickFuture.get());
+        } catch (CancellationException e) {
+            // Expected
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    public void manyCLientsTest() throws BookStoreException {
+        manyClientsTestImpl(100000);
+    }
+
+    private void manyClientsTestImpl(int count) throws BookStoreException {
+        storeManager.addBooks(toAdd);
+
+        for(int i=0; i< count; i++) {
+            storeManager.addCopies(toBuy);
+        }
+
+        List<StockBook> initialBooks = storeManager.getBooks();
+        HashMap<Integer, Integer> preTestCopiesPerBook = new HashMap<Integer, Integer>();
+        initialBooks.forEach((book) -> preTestCopiesPerBook.put
+                             (book.getISBN(), book.getNumCopies()));
+
+        List<Future<Boolean>> buyers = new ArrayList<Future<Boolean>>();
+        List<Future<Boolean>> adders = new ArrayList<Future<Boolean>>();
+
+        ExecutorService executor = Executors.newFixedThreadPool(1000);
+
+        for(int i = 0; i < count; i++) {
+            buyers.add(executor.submit(new Callable<Boolean>() {
+                    public Boolean call() throws Exception {
+                        client.buyBooks(toBuy);
+                        return true;
+                    }
+                }));
+        }
+
+        for(int i = 0; i < count; i++) {
+           adders.add(executor.submit(new Callable<Boolean>() {
+                    public Boolean call() throws Exception {
+                        storeManager.addCopies(toBuy);
+                        return true;
+                    }
+                }));
+        }
+
+        // Wait for all threads to finish
+        try {
+            for(Future<Boolean> f : buyers) {
+                f.get();
+            }
+            for(Future<Boolean> f : adders) {
+                f.get();
+            }
+            // Verify that post-test book count is the same as pre-test
+            List<StockBook> curBooks = storeManager.getBooks();
+            for(StockBook book : curBooks) {
+                int preCopies = preTestCopiesPerBook.get(book.getISBN());
+                int curCopies = book.getNumCopies();
+                assertTrue(curCopies == preCopies);
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+
     }
 
 }
