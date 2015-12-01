@@ -2,6 +2,9 @@ package com.acertainbookstore.business;
 
 import com.acertainbookstore.utils.BookStoreUtility;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * The implementation of all parts of the book. Only parts of it are available
  * in the BookStoreClient and StockManager, cf. the Book interface and the
@@ -14,6 +17,7 @@ public class BookStoreBook extends ImmutableBook {
     private long timesRated;
     private long saleMisses;
     private boolean editorPick;
+    private ReadWriteLock lock;
 
     /**
      * Constructor to create a book object
@@ -26,6 +30,7 @@ public class BookStoreBook extends ImmutableBook {
         this.setNumCopies(numCopies);
         this.setTotalRating(0);
         this.setEditorPick(false);
+        this.lock = new ReentrantReadWriteLock();
     }
 
     /**
@@ -218,6 +223,10 @@ public class BookStoreBook extends ImmutableBook {
     public BookStoreBook copy() {
         return new BookStoreBook(this.getISBN(), new String(this.getTitle()),
                 new String(this.getAuthor()), this.getPrice(), this.numCopies);
+    }
+
+    public ReadWriteLock getLock() {
+        return this.lock;
     }
 
 }
