@@ -240,7 +240,30 @@ As it can be seen, the only potential conflicts are between $R_2$ and $W_3$, but
 since $T_2$ completes before $T_3$ starts its write phase its WAR dependency
 isn't violated. Thus, $T_3$ can commit.
 
-\section{Programming Assignments}
+\section{Programming Assignment}
+
+\subsection{Tests}
+\subsubsection{Test 1 --- Fixed number of parallel buys and adds}
+In this test we run two clients, $C_1$ and $C_2$ both of which operates on the
+same set of books. $C_1$ buys books while $C_2$ re-adds the same number of
+copies. The two clients perform a fixed number of results in parallel. The test
+is successful if the number of copies in the book store is the same before and
+after the test has run.
+
+The purpose of the test is to check the all-or-nothing semantics of {\tt
+  buyBooks} and {\tt addCopies}. If either a buy or an add operation only
+completes partially the number of books will be left in an incomplete state and
+will thus never 
+
+\subsubsection{Test 2 --- }
+The purpose of this test is to check that the all-or-nothing semantics of the
+buyBooks and 
+
+\subsection{Test 3 --- }
+
+This test is a variation of the first test except that queries originate from
+1000 different clients instead of just 2
+
 \subsection{Implementation}
 
 \subsection{Questions for Concurrent Implementation of Bookstore}
@@ -252,6 +275,11 @@ isn't violated. Thus, $T_3$ can commit.
 
 \subsubsection{Correctness of Locking Protocol}
 \subsubsection{Deadlock Occurrence}
+In order for a deadlock to occur, we need to acquire a lock which is never
+released. For this to happen, a thread of execution must exit abnormally before
+it gets a chance to release all of the locks that it has acquired.
+
+In our implementation, we handle the first situation by 
 \subsubsection{Scalability}
 \subsubsection{Locking Overhead}
 
