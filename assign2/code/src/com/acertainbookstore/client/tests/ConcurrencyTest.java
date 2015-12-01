@@ -154,16 +154,12 @@ public class ConcurrencyTest {
     }
 
     @Test
-    public void fixedIterationsTest2() throws BookStoreException {
-        fixedIterations2(10000);
+    public void untilSuccessTest() throws BookStoreException {
+        untilSuccessTestImpl(10000);
     }
 
-    private void fixedIterations2(final int iterations) throws BookStoreException {
+    private void untilSuccessTestImpl(final int passes) throws BookStoreException {
         storeManager.addBooks(toAdd);
-
-        for(int i = 0; i < iterations; i++) {
-            storeManager.addCopies(toBuy);
-        }
 
         List<StockBook> initialBooks = storeManager.getBooks();
         HashMap<Integer, Integer> preTestCopiesPerBook = new HashMap<Integer, Integer>();
@@ -174,37 +170,42 @@ public class ConcurrencyTest {
 
         Future<Boolean> buySellFuture = executor.submit(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
-                    for (int i = 0; i < iterations; i++) {
-                        // Buy first and them immediatley add books
+                    for(;;) {
                         client.buyBooks(toBuy);
                         storeManager.addCopies(toBuy);
                     }
-                    return true;
                 }
             });
 
-        // Future for verifying that the number of books, at any time, is equal
-        // to either before - copies or before
+        // Future for verifying that the number of copies of books, at any time,
+        // is either the original number of copies or 
         Future<Boolean> checkFuture = executor.submit(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
-                    Boolean res = true;
-                    for (int i = 0; i < iterations; i++) {
+                    int mypasses = passes;
+                    while (mypasses > 0) {
                         List<StockBook> curBooks = storeManager.getBooks();
                         for(StockBook book : curBooks) {
                             int copies = copiesOfIsbn.get(book.getISBN());
                             int preCopies = preTestCopiesPerBook.get(book.getISBN());
                             int curCopies = book.getNumCopies();
-                            res &= (curCopies == preCopies ||
-                                    curCopies == preCopies - copies);
+                            if (!(curCopies == preCopies ||
+                                  curCopies == preCopies - copies)) {
+                                buySellFuture.cancel(true);
+                                return false;
+                            }
                         }
+                        mypasses--;
                     }
-                    return res;
+                    buySellFuture.cancel(true);
+                    return true;
                 }
             });
 
         try {
-            buySellFuture.get();
             assertTrue(checkFuture.get());
+            buySellFuture.get();
+        } catch(CancellationException e) {
+            // This is expected
         } catch(Exception e) {
             e.printStackTrace();
             fail();
