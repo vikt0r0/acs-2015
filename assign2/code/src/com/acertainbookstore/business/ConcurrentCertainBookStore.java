@@ -480,7 +480,11 @@ public class ConcurrentCertainBookStore implements BookStore, StockManager {
             book = bookMap.get(ISBN);
 
             if (book != null) {
-                book.getLock().writeLock().unlock();
+                try {
+                    book.getLock().writeLock().unlock();
+                } catch (IllegalMonitorStateException e) {
+
+                }
             }
         }
     }
@@ -494,7 +498,11 @@ public class ConcurrentCertainBookStore implements BookStore, StockManager {
             book = bookMap.get(ISBN);
 
             if (book != null) {
-                book.getLock().readLock().unlock();
+                try {
+                    book.getLock().readLock().unlock();
+                } catch (IllegalMonitorStateException e) {
+
+                }
             }
         }
     }
