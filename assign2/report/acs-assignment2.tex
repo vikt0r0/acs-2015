@@ -25,6 +25,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{booktabs}
+\usepackage{csquotes}
 \usepackage{array}
 \usepackage{lmodern} % better font
 \usepackage[noend]{algpseudocode}
@@ -182,12 +183,9 @@ $W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
 \label{tbl:scenario1}
 \end{table}
 
-In the case that $T_{2}$ writes element $4$ after $T_{3}$ has read element $4$,
-$T_{3}$ will have to perform a rollback, as RAW dependency is violated. In the
-case where $T_{2}$ writes element $4$ before $T_{3}$ reads element $4$, $T_{3}$
-can commit.
+There is an overlap between the read set of $T_{3}$ and the write set of $T_{2}$ on element $4$, so $T_{3}$ will have to abort.
 
-\paragraph{Scenario 2} In this case, it is given that \begin{inparaenum}[1]}
+\paragraph{Scenario 2} In this case, it is given that \begin{inparaenum}[1]
 \item $T_{1}$ completes before $T_{3}$ begins its write phase and \item $T_{2}$
   completes its read phase before $T_{3}$ begins its read phase.\end{inparaenum} This means that
 $W_{1} \cap W_{3} = \emptyset$, $R_{1} \cap W_{3} = \emptyset$,
@@ -209,9 +207,7 @@ $W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
 \end{table}
 
 In the case, $T_{1}$ writes element $3$ after $T_{3}$ has read element $3$,
-$T_{3}$ will have to perform a rollback, as RAW dependency is violated. In the
-case where $T_{1}$ writes element $3$ before $T_{3}$ reads element $3$, $T_{3}$
-can commit.
+$T_{3}$ a RAW dependency is violated. In this case, $T_{3}$ will have to perform a rollback.
 
 \paragraph{Scenario 3}
 In this final case, we know that \begin{inparaenum}[1)] \item $T_1$ completes before
@@ -240,12 +236,18 @@ since $T_2$ completes before $T_3$ starts its write phase its WAR dependency
 isn't violated. Thus, $T_3$ can commit.
 
 \section{Programming Assignments}
-\subsection{Implementation}
-
 \subsection{Questions for Concurrent Implementation of Bookstore}
 \subsubsection{Description of Implementation}
+The locking protocol was implemented with a single \texttt{ReentrantReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReentrantReadWriteLock.html}} implementing the  \texttt{ReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReadWriteLock.html}}. The JavaDoc for the \texttt{ReadWriteLock} interface  states:
+
+\begin{displayquote}
+A ReadWriteLock maintains a pair of associated locks, one for read-only operations and one for writing. The read lock may be held simultaneously by multiple reader threads, so long as there are no writers. The write lock is exclusive.
+
+All ReadWriteLock implementations must guarantee that [...] a thread successfully acquiring the read lock will see all updates made upon previous release of the write lock.
+\end{displayquote}
+Methods exhibiting behavior semantically corresponding to reads acquire the read lock (shared lock) before reading and releases it afterwards. This read lock non-blocking for multiple readers. Methods exhibiting write-like behavior acquire the write lock (exclusive lock).
 \begin{enumerate}[(a)]
-\item{Answer here!}
+\item Before-or-after atomicity is achieved by using a 
 \item{Answer here!}
 \end{enumerate}
 
