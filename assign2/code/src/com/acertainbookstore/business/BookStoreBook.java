@@ -46,6 +46,7 @@ public class BookStoreBook extends ImmutableBook {
         this.setNumCopies(bookToCopy.getNumCopies());
         this.setTotalRating(bookToCopy.getTotalRating());
         this.setEditorPick(bookToCopy.isEditorPick());
+        this.lock = new ReentrantReadWriteLock();
     }
 
     public long getTotalRating() {
