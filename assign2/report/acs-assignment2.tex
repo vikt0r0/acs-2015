@@ -161,7 +161,7 @@ accesses is a write.
 \paragraph{Scenario 1}
 We will consider the intersection of all read and write sets that involve
 $T_{3}$, with a few restrictions. We know that \begin{inparaenum}[1)] \item
-  $T_{1}$ completes before
+$T_{1}$ completes before
 $T_{3}$ begins with its write phase and \item $T_{2}$ completes read phase before
 $T_{3}$ does.\end{inparaenum} This means $R_{1} \cap W_{3} = \emptyset$,
 $W_{1} \cap R_{3} = \emptyset$, $W_{1} \cap W_{3} = \emptyset$ and
@@ -226,7 +226,7 @@ $R_{2}$ & x  & x  & $\{7,8\}$ \\ \hline
 $R_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
 $W_{1}$ & x  & x  & $\emptyset$ \\ \hline
 $W_{2}$ & x  & x  & $\emptyset$ \\ \hline
-  $W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
+$W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
 \end{tabular}
 \caption{Intersections of all $R_{i}$ and $W_{i}$ that overlap and involve $T_{3}$.}
 \label{tbl:scenario3}
@@ -239,25 +239,54 @@ isn't violated. Thus, $T_3$ can commit.
 \section{Programming Assignments}
 \subsection{Tests}
 \subsubsection{Test 1 --- Fixed number of parallel buys and adds}
-In this test we run two clients, $C_1$ and $C_2$ both of which operates on the
-same set of books. $C_1$ buys books while $C_2$ re-adds the same number of
-copies. The two clients perform a fixed number of results in parallel. The test
-is successful if the number of copies in the book store is the same before and
-after the test has run.
+In this test we have two clients, $C_1$ and $C_2$, both of which operate on the
+same set of books. $C_1$ buys a number of copies while $C_2$ re-adds the same
+number of copies. The two clients perform a fixed number of operations in
+parallel. The test is successful if the number of copies in the book store is
+the same before and after the test has run.
 
-The purpose of the test is to check the all-or-nothing semantics of {\tt
-  buyBooks} and {\tt addCopies}. If either a buy or an add operation only
-completes partially the number of books will be left in an incomplete state and
-will thus never 
+The purpose of the test is to check of the operations performed by {\tt
+  buyBooks} and {\tt addCopies} are before-or-after atomic. If either a buy or
+an add operation only completes partially the number of books will be left in an
+incomplete state. This will cause the number of copies of books after the test
+to not be equal to the number of books before the test.
 
-\subsubsection{Test 2 --- }
-The purpose of this test is to check that the all-or-nothing semantics of the
-buyBooks and 
+\subsubsection{Test 2 --- Continuous buys and adds until successful}
+The purpose of this test is to check if the actions performed by {\tt buyBooks}
+and {\tt addCopies} are all-or-nothing atomic. The test uses two clients, $C_1$
+and $C_2$. $C_1$ continuously buys a set of books and then immediately restocks
+the same number of books. $C_2$ continuously checks if the number of copies of
+books in stock are either equal to the number of copies before the start of the
+test (state after {\tt addCopies}) or is equal to the number of copies before
+the start of the test minus the number of copies bought (the state after {\tt
+  buyBooks}). If this test fails at any time, it means that the actions
+performed by {\tt buyBooks} and {\tt addCopies} are not all-or-nothing atomic
+and that the bookstore has been left in an inconsistent state. $C_2$ will
+terminate $C_1$ (and the test) after a specified number of successful passes has
+been performed or the test has failed.
 
-\subsection{Test 3 --- }
+\subsection{Test 3 --- Editor's picks atomicity}
+This test has the purpose of this test is to check if the {\tt
+  updateEditorPicks} function applies changes atomically. The methodology used
+by the test is a variation of the one used in Test 2: One client $C_1$
+continuously sets and unsets the Editors Picks property on a set of
+books. Another client, $C_2$, continuously gets the set of books from the
+StoreManager and checks if all of them has the Editors Picks property either set
+or unset. If $C_2$ at some point retrieves a set of books where the properties
+are inconsistent, it's an indication that the change performed by {\tt
+  updateEditorPicks} was not atomic.
 
-This test is a variation of the first test except that queries originate from
-1000 different clients instead of just 2
+\subsection{Test 4 --- Many clients}
+This test checks that the before-and-after atomicity of the {\tt buyBooks} and
+{\tt addCopies} functions holds under the stress of more than 2 clients
+performing simultaneous queries. It performs the same actions as Test 1,
+continuously buying and adding copies of books. Multiple threads each perform a
+single book purchase or book addition, modeling non-determinism, which is
+implicit in large-scale client-server systems. In addition to testing
+scalability, this test also stress-tests the interface, in order to ensure
+the correct result in non-deterministic input scenarios, approximating a
+real-world load on the system.
+
 
 \subsection{Questions for Concurrent Implementation of Bookstore}
 \subsubsection{Description of Implementation}
@@ -270,20 +299,54 @@ All ReadWriteLock implementations must guarantee that [...] a thread successfull
 \end{displayquote}
 Methods exhibiting behavior semantically corresponding to reads acquire the read lock (shared lock) before reading and releases it afterwards. This read lock non-blocking for multiple readers. Methods exhibiting write-like behavior acquire the write lock (exclusive lock).
 \begin{enumerate}[(a)]
-\item Before-or-after atomicity is achieved by using a 
+\item Before-or-after atomicity is achieved by using conservative (non-strict)
+  two phase locking. By making sure any possible exceptions are thrown
+  \emph{before} starting to release locks, we eliminate the need for cascading
+  aborts.
 \item{Answer here!}
 \end{enumerate}
 
 \subsubsection{Correctness of Locking Protocol}
-\subsubsection{Deadlock Occurrence}
-In order for a deadlock to occur, we need to acquire a lock which is never
-released. For this to happen, a thread of execution must exit abnormally before
-it gets a chance to release all of the locks that it has acquired.
 
-In our implementation, we handle the first situation by 
+We use conservative (non-strict) two phase locking as our locking protocol, with
+one lock per book. We handle predicate reads by having \emph{one} read/write
+lock for the \texttt{bookMap}, where a transaction that adds/removes books must
+acquire the write lock, while all other transactions must have a read locks. In
+this way we make sure that no new books are added while an operation is scanning
+all books (and other such problems).
+
+\subsubsection{Deadlock Occurrence}
+
+%In order for a deadlock to occur, we need to acquire a lock which is never
+%released. For this to happen, a thread of execution must exit abnormally before
+%it gets a chance to release all of the locks that it has acquired.
+%
+%In our implementation, we handle the first situation by
+
+By having a predefined order to acquire locks in, we can be sure to avoid
+deadlocks when using conservative two phase locking. We use ISBN as the ordering
+mechanism for acquiring locks.
+
 \subsubsection{Scalability}
+
+The lock for \texttt{bookMap} is a bottleneck if many clients wants to remove
+and add books from the bookstore, as all require a write lock. However, with
+this specific use case, it does not seem likely to happen.
+
+The current implementation is still limited to a being run on a single machine,
+and that puts an upper bound on the number of threads, TCP connections, and
+total bandwidth. Adding the ability to run the service on multiple machines
+could help serve a greater number of remote clients.
+
 \subsubsection{Locking Overhead}
 
+Compared to only using one lock, two phase locking has a higher overhead when
+requests only wants to read information about books, but it allows higher
+concurrency as multiple users to buy \emph{different} books at the same time.
+
+By using conservative (non-strict) two phase locking, we gain greater
+concurrency than conservative strict two phase locking. Using the
+non-conservative version would yield even greater concurrency.
 
 \end{document}
 
