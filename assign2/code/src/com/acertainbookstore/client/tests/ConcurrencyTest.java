@@ -107,7 +107,7 @@ public class ConcurrencyTest {
 
     @Test
     public void fixedIterationTest() throws BookStoreException {
-        fixedIterations(100);
+        fixedIterations(1000000);
     }
 
     /**
