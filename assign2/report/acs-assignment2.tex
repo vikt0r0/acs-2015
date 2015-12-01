@@ -188,7 +188,7 @@ $T_{3}$ will have to perform a rollback, as RAW dependency is violated. In the
 case where $T_{2}$ writes element $4$ before $T_{3}$ reads element $4$, $T_{3}$
 can commit.
 
-\paragraph{Scenario 2} In this case, it is given that \begin{inparaenum}[1]
+\paragraph{Scenario 2} In this case, it is given that \begin{inparaenum}[1)]
 \item $T_{1}$ completes before $T_{3}$ begins its write phase and \item $T_{2}$
   completes its read phase before $T_{3}$ begins its read phase.\end{inparaenum} This means that
 $W_{1} \cap W_{3} = \emptyset$, $R_{1} \cap W_{3} = \emptyset$,
