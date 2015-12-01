@@ -30,8 +30,11 @@
 \usepackage[noend]{algpseudocode}
 \usepackage{algorithm}
 \usepackage{tikz}
+\usepackage{paralist}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
 \usetikzlibrary{arrows, decorations.markings}
 \usepackage{hyperref} % always load hyper ref in the end
+\usepackage{cleveref} % except cleveref
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \newcommand*\justify{%
@@ -187,8 +190,31 @@ $W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
 
 In the case, $T_{1}$ writes element $3$ after $T_{3}$ has read element $3$, $T_{3}$ will have to perform a rollback, as RAW dependency is violated. In the case where $T_{1}$ writes element $3$ before $T_{3}$ reads element $3$, $T_{3}$ can commit.
 
-
 \paragraph{Scenario 3}
+In this final case, we know that \begin{inparaenum}[1)] \item $T_1$ completes before
+  $T_3$ starts its write phase and that \item $T_2$ completes before $T_3$
+  starts its write phase \end{inparaenum}. All of the intersections between the
+read and write sets can be seen in \Cref{tbl:scenario3}.
+
+\begin{table}[!hbt]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$\cap$  & $W_{1}$ & $W_{2}$ & $W_{3}$    \\ \hline
+$R_{1}$ & x  & x  & $\emptyset$ \\ \hline
+$R_{2}$ & x  & x  & $\{7,8\}$ \\ \hline
+$R_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
+$W_{1}$ & x  & x  & $\emptyset$ \\ \hline
+$W_{2}$ & x  & x  & $\emptyset$ \\ \hline
+  $W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
+\end{tabular}
+\caption{Intersections of all $R_{i}$ and $W_{i}$ that overlap and involve $T_{3}$.}
+\label{tbl:scenario3}
+\end{table}
+
+As it can be seen, the only potential conflicts are between $R_2$ and $W_3$, but
+since $T_2$ completes before $T_3$ starts its write phase its WAR dependency
+isn't violated. Thus, $T_3$ can commit.
 
 \section{Programming Assignments}
 \subsection{Implementation}
