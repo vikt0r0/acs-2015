@@ -152,9 +152,10 @@ T3:        X(Z)   C
 In the Kung-Robinson optimistic concurrency model, we have to consider
 intersections of overlapping read and write sets, $R_{i}$ and $W_{i}$
 respectively, for all transactions $T_{i}$. A non-empty intersection
-semantically corresponds to possible RAW, WAR and WAW conflicts/dependencies,
-i.e. if the same location is accessed by two different transactions and at least
-one of the accesses is a write.
+semantically corresponds to possible Read After Write (RAW), Write After Read
+(WAR) and Write After Write (WAW) conflicts/dependencies, i.e. if the same
+location is accessed by two different transactions and at least one of the
+accesses is a write.
 
 
 \paragraph{Scenario 1}
@@ -185,7 +186,7 @@ $W_{3}$ & $\emptyset$ & $\emptyset$ & x \\ \hline
 
 There is an overlap between the read set of $T_{3}$ and the write set of $T_{2}$ on element $4$, so $T_{3}$ will have to abort.
 
-\paragraph{Scenario 2} In this case, it is given that \begin{inparaenum}[1]
+\paragraph{Scenario 2} In this case, it is given that \begin{inparaenum}[1)]
 \item $T_{1}$ completes before $T_{3}$ begins its write phase and \item $T_{2}$
   completes its read phase before $T_{3}$ begins its read phase.\end{inparaenum} This means that
 $W_{1} \cap W_{3} = \emptyset$, $R_{1} \cap W_{3} = \emptyset$,
@@ -236,6 +237,28 @@ since $T_2$ completes before $T_3$ starts its write phase its WAR dependency
 isn't violated. Thus, $T_3$ can commit.
 
 \section{Programming Assignments}
+\subsection{Tests}
+\subsubsection{Test 1 --- Fixed number of parallel buys and adds}
+In this test we run two clients, $C_1$ and $C_2$ both of which operates on the
+same set of books. $C_1$ buys books while $C_2$ re-adds the same number of
+copies. The two clients perform a fixed number of results in parallel. The test
+is successful if the number of copies in the book store is the same before and
+after the test has run.
+
+The purpose of the test is to check the all-or-nothing semantics of {\tt
+  buyBooks} and {\tt addCopies}. If either a buy or an add operation only
+completes partially the number of books will be left in an incomplete state and
+will thus never 
+
+\subsubsection{Test 2 --- }
+The purpose of this test is to check that the all-or-nothing semantics of the
+buyBooks and 
+
+\subsection{Test 3 --- }
+
+This test is a variation of the first test except that queries originate from
+1000 different clients instead of just 2
+
 \subsection{Questions for Concurrent Implementation of Bookstore}
 \subsubsection{Description of Implementation}
 The locking protocol was implemented with a single \texttt{ReentrantReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReentrantReadWriteLock.html}} implementing the  \texttt{ReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReadWriteLock.html}}. The JavaDoc for the \texttt{ReadWriteLock} interface  states:
@@ -253,6 +276,11 @@ Methods exhibiting behavior semantically corresponding to reads acquire the read
 
 \subsubsection{Correctness of Locking Protocol}
 \subsubsection{Deadlock Occurrence}
+In order for a deadlock to occur, we need to acquire a lock which is never
+released. For this to happen, a thread of execution must exit abnormally before
+it gets a chance to release all of the locks that it has acquired.
+
+In our implementation, we handle the first situation by 
 \subsubsection{Scalability}
 \subsubsection{Locking Overhead}
 
