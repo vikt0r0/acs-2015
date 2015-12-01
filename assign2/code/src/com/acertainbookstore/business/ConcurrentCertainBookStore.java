@@ -132,13 +132,10 @@ public class ConcurrentCertainBookStore implements BookStore, StockManager {
 
         bookMapLock.readLock().lock();
         Collection<BookStoreBook> bookMapValues = bookMap.values();
-        for (BookStoreBook book : bookMapValues) {
-            book.getLock().readLock().lock();
-        }
+        List<Integer> ISBNs = bookMapValues.stream().map(s -> s.getISBN()).collect(Collectors.toList());
+        acquireReadLocks(ISBNs);
         for (BookStoreBook book : bookMapValues) {
             listBooks.add(book.immutableStockBook());
-        }
-        for (BookStoreBook book : bookMapValues) {
             book.getLock().readLock().unlock();
         }
         bookMapLock.readLock().unlock();
@@ -348,10 +345,11 @@ public class ConcurrentCertainBookStore implements BookStore, StockManager {
             book = (BookStoreBook) pair.getValue();
             if (book.isEditorPick()) {
                 listAllEditorPicks.add(book);
-                book.getLock().readLock().lock();
                 editorsPickISBNs.add(book.getISBN());
             }
         }
+
+        acquireReadLocks(editorsPickISBNs);
 
         // Find numBooks random indices of books that will be picked
         Random rand = new Random();
