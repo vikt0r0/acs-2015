@@ -270,7 +270,10 @@ All ReadWriteLock implementations must guarantee that [...] a thread successfull
 \end{displayquote}
 Methods exhibiting behavior semantically corresponding to reads acquire the read lock (shared lock) before reading and releases it afterwards. This read lock non-blocking for multiple readers. Methods exhibiting write-like behavior acquire the write lock (exclusive lock).
 \begin{enumerate}[(a)]
-\item Before-or-after atomicity is achieved by using a
+\item Before-or-after atomicity is achieved by using conservative (non-strict)
+  two phase locking. By making sure any possible exceptions are thrown
+  \emph{before} starting to release locks, we eliminate the need for cascading
+  aborts.
 \item{Answer here!}
 \end{enumerate}
 
