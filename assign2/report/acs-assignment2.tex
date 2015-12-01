@@ -290,20 +290,22 @@ real-world load on the system.
 
 \subsection{Questions for Concurrent Implementation of Bookstore}
 \subsubsection{Description of Implementation}
-The locking protocol was implemented with a single \texttt{ReentrantReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReentrantReadWriteLock.html}} implementing the  \texttt{ReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReadWriteLock.html}}. The JavaDoc for the \texttt{ReadWriteLock} interface  states:
+The locking protocol was implemented with \texttt{ReentrantReadWriteLock}s\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReentrantReadWriteLock.html}} implementing the  \texttt{ReadWriteLock}\footnote{\url{http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/locks/ReadWriteLock.html}} interface. The JavaDoc for the \texttt{ReadWriteLock} interface  states:
 
 \begin{displayquote}
 A ReadWriteLock maintains a pair of associated locks, one for read-only operations and one for writing. The read lock may be held simultaneously by multiple reader threads, so long as there are no writers. The write lock is exclusive.
 
 All ReadWriteLock implementations must guarantee that [...] a thread successfully acquiring the read lock will see all updates made upon previous release of the write lock.
 \end{displayquote}
-Methods exhibiting behavior semantically corresponding to reads acquire the read lock (shared lock) before reading and releases it afterwards. This read lock non-blocking for multiple readers. Methods exhibiting write-like behavior acquire the write lock (exclusive lock).
+A lock is created for each \texttt{BookStoreBook}, and methods that update/read a book need to acquire the write/read lock, respectively, of that book beforehand. In order to avoid the problem of phantom books being added/removed while transactions are in progress, another, separate lock for the book map was introduced. Methods that add or remove books from the map must acquire its write lock before doing so while methods that do not must acquire the read lock for the entire duration of the transaction.
+
 \begin{enumerate}[(a)]
 \item Before-or-after atomicity is achieved by using conservative (non-strict)
   two phase locking. By making sure any possible exceptions are thrown
   \emph{before} starting to release locks, we eliminate the need for cascading
   aborts.
-\item{Answer here!}
+  
+\item The correctness was tested by having separate threads perform interleaved transactional updates that reads and writes data of the books, e.g. the \texttt{numCopies} field. If the number of threads and operations that operate on the same set of books are high enough, the probability that dirty reads and writes (if possible) will occur will approach 1 and the bookstore will be in a an inconsistent state. This is easily checked.
 \end{enumerate}
 
 \subsubsection{Correctness of Locking Protocol}
