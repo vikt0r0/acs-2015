@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -28,6 +29,7 @@ public class ConcurrencyTest {
     private static boolean localTest = true;
     private static StockManager storeManager;
     private static BookStore client;
+    private static HashMap<Integer, Integer> copiesOfIsbn;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -54,16 +56,20 @@ public class ConcurrencyTest {
         toBuy = new HashSet<>();
 
         int copies; int isbn;
+        copiesOfIsbn = new HashMap<Integer, Integer>();
 
         isbn = 1; copies = 8;
+        copiesOfIsbn.put(isbn, copies);
         toAdd.add(new ImmutableStockBook(isbn, "Star Wars 1", "Georg Lucas", .42f, copies, 0, 0, 0, false));
         toBuy.add(new BookCopy(isbn, copies));
 
         isbn++; copies = 4;
+        copiesOfIsbn.put(isbn, copies);
         toAdd.add(new ImmutableStockBook(isbn, "Star Wars 2", "Georg Lucas", .43f, copies, 0, 0, 0, false));
         toBuy.add(new BookCopy(isbn, copies));
 
         isbn++; copies = 3;
+        copiesOfIsbn.put(isbn, copies);
         toAdd.add(new ImmutableStockBook(isbn, "Star Wars 2", "Georg Lucas", .44f, copies, 0, 0, 0, false));
         toBuy.add(new BookCopy(isbn, copies));
     }
@@ -155,14 +161,14 @@ public class ConcurrencyTest {
     private void fixedIterations2(final int iterations) throws BookStoreException {
         storeManager.addBooks(toAdd);
 
-        final int copies = 8 + 4 + 3;
-
         for(int i = 0; i < iterations; i++) {
             storeManager.addCopies(toBuy);
         }
 
         List<StockBook> initialBooks = storeManager.getBooks();
-        final int preTestCount = initialBooks.size();
+        HashMap<Integer, Integer> preTestCopiesPerBook = new HashMap<Integer, Integer>();
+        initialBooks.forEach((book) -> preTestCopiesPerBook.put
+                             (book.getISBN(), book.getNumCopies()));
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
@@ -183,9 +189,14 @@ public class ConcurrencyTest {
                 public Boolean call() throws Exception {
                     Boolean res = true;
                     for (int i = 0; i < iterations; i++) {
-                        int curCount = storeManager.getBooks().size();
-                        res &= (curCount == preTestCount ||
-                                curCount == preTestCount - copies);
+                        List<StockBook> curBooks = storeManager.getBooks();
+                        for(StockBook book : curBooks) {
+                            int copies = copiesOfIsbn.get(book.getISBN());
+                            int preCopies = preTestCopiesPerBook.get(book.getISBN());
+                            int curCopies = book.getNumCopies();
+                            res &= (curCopies == preCopies ||
+                                    curCopies == preCopies - copies);
+                        }
                     }
                     return res;
                 }
