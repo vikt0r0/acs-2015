@@ -248,11 +248,11 @@ after the test has run.
 The purpose of the test is to check the all-or-nothing semantics of {\tt
   buyBooks} and {\tt addCopies}. If either a buy or an add operation only
 completes partially the number of books will be left in an incomplete state and
-will thus never 
+will thus never
 
 \subsubsection{Test 2 --- }
 The purpose of this test is to check that the all-or-nothing semantics of the
-buyBooks and 
+buyBooks and
 
 \subsection{Test 3 --- }
 
@@ -270,20 +270,51 @@ All ReadWriteLock implementations must guarantee that [...] a thread successfull
 \end{displayquote}
 Methods exhibiting behavior semantically corresponding to reads acquire the read lock (shared lock) before reading and releases it afterwards. This read lock non-blocking for multiple readers. Methods exhibiting write-like behavior acquire the write lock (exclusive lock).
 \begin{enumerate}[(a)]
-\item Before-or-after atomicity is achieved by using a 
+\item Before-or-after atomicity is achieved by using a
 \item{Answer here!}
 \end{enumerate}
 
 \subsubsection{Correctness of Locking Protocol}
-\subsubsection{Deadlock Occurrence}
-In order for a deadlock to occur, we need to acquire a lock which is never
-released. For this to happen, a thread of execution must exit abnormally before
-it gets a chance to release all of the locks that it has acquired.
 
-In our implementation, we handle the first situation by 
+We use conservative (non-strict) two phase locking as our locking protocol, with
+one lock per book. We handle predicate reads by having \emph{one} read/write
+lock for the \texttt{bookMap}, where a transaction that adds/removes books must
+acquire the write lock, while all other transactions must have a read locks. In
+this way we make sure that no new books are added while an operation is scanning
+all books (and other such problems).
+
+\subsubsection{Deadlock Occurrence}
+
+%In order for a deadlock to occur, we need to acquire a lock which is never
+%released. For this to happen, a thread of execution must exit abnormally before
+%it gets a chance to release all of the locks that it has acquired.
+%
+%In our implementation, we handle the first situation by
+
+By having a predefined order to acquire locks in, we can be sure to avoid
+deadlocks when using conservative two phase locking. We use ISBN as the ordering
+mechanism for acquiring locks.
+
 \subsubsection{Scalability}
+
+The lock for \texttt{bookMap} is a bottleneck if many clients wants to remove
+and add books from the bookstore, as all require a write lock. However, with
+this specific use case, it does not seem likely to happen.
+
+The current implementation is still limited to a being run on a single machine,
+and that puts an upper bound on the number of threads, TCP connections, and
+total bandwidth. Adding the ability to run the service on multiple machines
+could help serve a greater number of remote clients.
+
 \subsubsection{Locking Overhead}
 
+Compared to only using one lock, two phase locking has a higher overhead when
+requests only wants to read information about books, but it allows higher
+concurrency as multiple users to buy \emph{different} books at the same time.
+
+By using conservative (non-strict) two phase locking, we gain greater
+concurrency than conservative strict two phase locking. Using the
+non-conservative version would yield even greater concurrency.
 
 \end{document}
 
