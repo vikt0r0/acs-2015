@@ -9,6 +9,7 @@
           argument justifying it?
         </text>
         <answer>YES</answer>
+        <comment>Details of why strick 2PL would not work is a bit weak.</comment>
       </schedule1>
 
       <schedule2>
@@ -32,6 +33,9 @@
           argument justifying it?
         </text>
         <answer>YES</answer>
+        <comment>Spelling mistkae, conflict between T2 and T3. Could make things
+        more clear by highlighting that the conflict is there _because_ T2 is
+        not guarnteed to finish before T3 reads {4}.</comment>
       </scenario1>
 
       <scenario2>
@@ -51,6 +55,7 @@
           argument justifying it?
         </text>
         <answer>YES</answer>
+        <comment></comment>
       </scenario3>
 
     </question2>
