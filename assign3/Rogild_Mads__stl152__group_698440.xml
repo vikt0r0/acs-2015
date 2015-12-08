@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <review for-group="Rogild_Mads__stl152__group_698440">
   <exercises>
 
@@ -8,8 +9,9 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>NO</answer>
+        <comment>The solutions provided are correct, but they lack a convincing
+        argument for why that is the case</comment>
       </schedule1>
 
       <schedule2>
@@ -17,8 +19,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>No</answer>
+        <comment>Answer is correct, but again, argument is insufficient</comment>
       </schedule2>
     </question1>
 
@@ -29,8 +31,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>YES</answer>
+        <comment></comment>
       </scenario1>
 
       <scenario2>
@@ -38,8 +40,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>YES</answer>
+        <comment></comment>
       </scenario2>
 
       <scenario3>
@@ -47,8 +49,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>YES</answer>
+        <comment></comment>
       </scenario3>
 
     </question2>
@@ -63,14 +65,16 @@
           Does the solution contain a clear description of the approach
           used to achieve before-or-after atomicity?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q1a>
       <q1b>
         <text>
           Provide comments on any aspects that you found unclear in the
           description of the approach to achieve before-or-after atomicity
         </text>
-        <answer>[Free text]</answer>
+        <answer>It contains a lowish-level description of how their custom locking
+        mechanism works rather than describing how it is used to achieve
+        before-or-after atomicity in the book-store</answer>
       </q1b>
       <q1c>
         <text>
@@ -78,7 +82,7 @@
           assignment description as well as of at least another two test
           cases?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q1c>
       <q1d-i>
         <text>
@@ -86,7 +90,7 @@
           execution
           is correct in that it respects invariants designed in the test?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q1d-i>
       <q1d-ii>
         <text>
@@ -95,7 +99,7 @@
           arguable that these intermediate states could be found in an
           equivalent serial schedule?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q1d-ii>
       <q1e>
         <text>
@@ -103,7 +107,14 @@
           descriptions were unclear according to the criteria, and suggestions for
           improvement
         </text>
-        <answer>[Free text]</answer>
+        <answer>The tests does attempt to check for the required aspects,
+        however due to implementation errors this does not correctly happen in
+        practice. A common error in many of the tests is that the concurrent
+        threads are started but not joined before the final state is
+        checked. Thus, the tests does not test the intended properties. The
+        testAddBuyTest additionally also doesn't correctly verify the number of
+        _copies_ in the bookstore since only the number of different books in
+        the bookstore is compared.</answer>
       </q1e>
     </question1>
 
@@ -115,7 +126,7 @@
           the correctness argument clearly identified (e.g., conservative, strict,
           conservative strict)?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q2a>
       <q2b>
         <text>
@@ -123,21 +134,26 @@
           protocol designed correspond to steps taken in the chosen variant
           of 2PL?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q2b>
       <q2c>
         <text>
           Is there an argument for the need to take into account predicate
           reads, with appropriate justification?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q2c>
       <q2d>
         <text>
           Provide comments on why you found any aspects of the correctness
           argument provided to be lacking, incorrect, or in need of improvement.
         </text>
-        <answer>[Free text]</answer>
+        <answer>The locking protocol is not correctly implemented. For instance,
+        in removeBooks the read lock is released before the write lock is
+        acquired. This violates all-or-nothing semantics and could cause the
+        function to exit with an unhandled exception. Furthermore, the
+        descriptions of the locking protocol does not relate to a specific
+        variant of 2PL.</answer>
       </q2d>
     </question2>
 
@@ -148,14 +164,23 @@
           Does the solution contain a correct argument for why deadlocks can
           occur in the locking protocol or why deadlocks cannot occur?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q3a>
       <q3b>
         <text>
           Provide comments on how the argument provided with respect to
           deadlocks could be improved
         </text>
-        <answer>[Free text]</answer>
+        <answer>The argument itself is close to being acceptable, however the
+        custom locking mechanism is broken and not thread-safe. Consequently it
+        is itself a source of deadlocks. It is implemented using non-atomic
+        ints, bools and ArrayLists. This means that lock and unlock operations
+        are not atomic and therefore the locking system is essentially
+        useless. Even if modifications to the lock state variables were made
+        atomic the locking system itself is not at all robust; when nothing is
+        locked calling releaseReadLock, getWriteLock and getReadLock in sequence
+        will cause all code depending on the locking system to deadlock and all
+        system resources will be spent executing spinlocks.</answer>
       </q3b>
     </question3>
 
@@ -166,14 +191,16 @@
           Is there a sound argument about the scalability limits of the
           concurrent implementation provided?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q4a>
       <q4b>
         <text>
           Provide comments on how the reflections on scalability could be
           improved
         </text>
-        <answer>[Free text]</answer>
+        <answer>The argument for scalability needs to deal with how performance
+        is impacted by addition of hardware and distribution across several
+        machines would impact the performance of the implementation.</answer>
       </q4b>
     </question4>
 
@@ -184,14 +211,18 @@
           Is there a sound argument in the solution about the trade-off between
           locking overhead and concurrency?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q5a>
       <q5b>
         <text>
           Provide comments on how the argument about performance trade-offs in
           the locking protocol could be improved
         </text>
-        <answer>[Free text]</answer>
+        <answer>Argument does not deal with the most important concurrency
+        limiting factor in the implementation. Due to the use of spinlocks,
+        virtually no concurrency is possible in practice. It doesn't take a lot
+        of waiting threads (holding spinlocks) before executing threads are
+        starved of system resources.</answer>
       </q5b>
     </question5>
   </programming>
