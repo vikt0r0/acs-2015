@@ -8,8 +8,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>YES</answer>
+        <comment>N/A</comment>
       </schedule1>
 
       <schedule2>
@@ -17,8 +17,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>YES</answer>
+        <comment>N/A</comment>
       </schedule2>
     </question1>
 
@@ -29,8 +29,10 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>NO</answer>
+        <comment>
+          Your conclusion is correct. However I do not see any convincing arguments as to why presumbable because I do not know how to interpret your diagram. It comes with no explanation. What do the 0s and 1s mean? How about 1, 2a, 2b and the x'es?
+        </comment>
       </scenario1>
 
       <scenario2>
@@ -38,8 +40,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>NO</answer>
+        <comment>Same as the comment of previous subquestion.</comment>
       </scenario2>
 
       <scenario3>
@@ -47,8 +49,8 @@
           Is the solution provided both correct and includes a convincing short
           argument justifying it?
         </text>
-        <answer>[YES/NO]</answer>
-        <comment>[If your answer is NO write your comment here]</comment>
+        <answer>NO</answer>
+        <comment>Same as comment of previous subquestion.</comment>
       </scenario3>
 
     </question2>
@@ -63,14 +65,16 @@
           Does the solution contain a clear description of the approach
           used to achieve before-or-after atomicity?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q1a>
       <q1b>
         <text>
           Provide comments on any aspects that you found unclear in the
           description of the approach to achieve before-or-after atomicity
         </text>
-        <answer>[Free text]</answer>
+        <answer>
+          The first sentence might be redundant and you forgot to acquire the write lock in removeAllBooks(). Otherwise good.
+        </answer>
       </q1b>
       <q1c>
         <text>
@@ -78,7 +82,7 @@
           assignment description as well as of at least another two test
           cases?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q1c>
       <q1d-i>
         <text>
@@ -86,7 +90,7 @@
           execution
           is correct in that it respects invariants designed in the test?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q1d-i>
       <q1d-ii>
         <text>
@@ -95,7 +99,7 @@
           arguable that these intermediate states could be found in an
           equivalent serial schedule?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q1d-ii>
       <q1e>
         <text>
@@ -103,7 +107,25 @@
           descriptions were unclear according to the criteria, and suggestions for
           improvement
         </text>
-        <answer>[Free text]</answer>
+        <answer>
+          1c) Yes for tests 1, 2. However, for test 3, you were specifically asked to 'test different concurrency aspects of your implementation'. I fail to see how this test is accomplishing that (or anything at all).
+
+          The first problem with the test is that each thread is ONLY performing reads, so your locking mechanism never blocks. Think about this: If you only read data, you might as well have no locking mechanism at all (this is why several threads are allowed to acquire the read-lock simultaneously), as this implies no conflicts. Recall that a potential conflict is when two different threads access to the same element, and one of the accesses is a write.
+
+          The reason you achieve a speedup thus has nothing to do with the choice of locking scheme (and hence the degree of concurrency, which is what you should be testing), but rather, the test is just showing that a higher degree of parallelism -> speedup when the program is threaded (which is to be expected and the reason why CPUs have several cores in the first place).
+
+          If you are confused about the difference between concurrency and parallelism see http://stackoverflow.com/questions/1050222/concurrency-vs-parallelism-what-is-the-difference. 
+
+          Now, say your test DID perform reads and writes (i.e. your locking mechanism would block threads to avoid conflicts, and concurrency becomes a factor), what you should test is that a higher granularity locking scheme -> higher degree of concurrency -> (hopefully) higher throughput, implying that the scheme would block less, and thus yield a higher throughput for any fixed number of cores. That is if the overhead of the chosen locking scheme is sufficiently small, of course. However this means that the test shoudl compare implementations different locking schemes of different granularities and test them against each other. A higher granularity locking scheme is probably faster (for any number of cores) as it implies a higher degree of concurrency, and hopefully the test would show this.
+
+          That being said, I think that this kind of test is more suitable as a benchmark.
+
+          Regarding test 4, it never changes the forever variable, to the test passes unconditionally, and is basically not accomplishing anything but testing that that false == false.
+
+          1di) Just to elaborate, for 1 and 2, yes, for 3 and 4, no.
+
+          1dii) Just to elaborate, for test 2, yes, for the rest, no.
+        </answer>
       </q1e>
     </question1>
 
@@ -115,7 +137,7 @@
           the correctness argument clearly identified (e.g., conservative, strict,
           conservative strict)?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q2a>
       <q2b>
         <text>
@@ -123,21 +145,25 @@
           protocol designed correspond to steps taken in the chosen variant
           of 2PL?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q2b>
       <q2c>
         <text>
           Is there an argument for the need to take into account predicate
           reads, with appropriate justification?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>NO</answer>
       </q2c>
       <q2d>
         <text>
           Provide comments on why you found any aspects of the correctness
           argument provided to be lacking, incorrect, or in need of improvement.
         </text>
-        <answer>[Free text]</answer>
+        <answer>
+          2a) Yes, because any read-write locking scheme implemented with 1 lock conforms to Strict 2PL, Conservative 2PL, Conservative Strict 2PL, and 2PL at the same time. However, the chosen locking scheme has the absolutely lowest granularity of any read-write locking scheme, as there is only 1 lock for 1 object, greatly reducing granularity and the degree of concurrency altogether. This somewhat defeats the purpose of locking, as not a lot of concurrency is gained.
+
+          2c) You mention it, but this does not depend on the number of objects, but rather on whether new objects can be added/removed.
+        </answer>
       </q2d>
     </question2>
 
@@ -148,14 +174,14 @@
           Does the solution contain a correct argument for why deadlocks can
           occur in the locking protocol or why deadlocks cannot occur?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q3a>
       <q3b>
         <text>
           Provide comments on how the argument provided with respect to
           deadlocks could be improved
         </text>
-        <answer>[Free text]</answer>
+        <answer>N/A</answer>
       </q3b>
     </question3>
 
@@ -166,14 +192,16 @@
           Is there a sound argument about the scalability limits of the
           concurrent implementation provided?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q4a>
       <q4b>
         <text>
           Provide comments on how the reflections on scalability could be
           improved
         </text>
-        <answer>[Free text]</answer>
+        <answer>
+          However, even worse, nobody can read/write to ANY book while a thread is writing to ANY book. That is the contention of the chosen locking scheme imposes a massive bottleneck depending on how the application is being used.
+        </answer>
       </q4b>
     </question4>
 
@@ -184,14 +212,14 @@
           Is there a sound argument in the solution about the trade-off between
           locking overhead and concurrency?
         </text>
-        <answer>[YES/NO]</answer>
+        <answer>YES</answer>
       </q5a>
       <q5b>
         <text>
           Provide comments on how the argument about performance trade-offs in
           the locking protocol could be improved
         </text>
-        <answer>[Free text]</answer>
+        <answer>N/A</answer>
       </q5b>
     </question5>
   </programming>
