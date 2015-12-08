@@ -31,7 +31,7 @@
         </text>
         <answer>NO</answer>
         <comment>
-          Your conclusion is correct. However I do not see any convincing arguments as to why presumbable because I do not know how to interpret your diagram. It comes with no explanation. What do the 0s and 1s mean? How about 1, 2a, 2b and the x'es?
+          Your conclusion is correct. However I do not see any convincing arguments as to why, presumbably because I do not know how to interpret your diagram. What do rows/columns, the 0s, 1s, 2a, 2b and the x'es mean?
         </comment>
       </scenario1>
 
@@ -112,13 +112,13 @@
 
           The first problem with the test is that each thread is ONLY performing reads, so your locking mechanism never blocks. Think about this: If you only read data, you might as well have no locking mechanism at all (this is why several threads are allowed to acquire the read-lock simultaneously), as this implies no conflicts. Recall that a potential conflict is when two different threads access to the same element, and one of the accesses is a write.
 
-          The reason you achieve a speedup thus has nothing to do with the choice of locking scheme (and hence the degree of concurrency, which is what you should be testing), but rather, the test is just showing that a higher degree of parallelism -> speedup when the program is threaded (which is to be expected and the reason why CPUs have several cores in the first place).
+          The reason you achieve a speedup thus should have nothing to do with the choice of locking scheme (and hence the degree of concurrency, which is what you should be testing), but rather, the test is just showing that a higher degree of parallelism -> speedup when the program is threaded (which is to be expected and the reason why CPUs have several cores in the first place).
 
           If you are confused about the difference between concurrency and parallelism see http://stackoverflow.com/questions/1050222/concurrency-vs-parallelism-what-is-the-difference. 
 
-          Now, say your test DID perform reads and writes (i.e. your locking mechanism would block threads to avoid conflicts, and concurrency becomes a factor), what you should test is that a higher granularity locking scheme -> higher degree of concurrency -> (hopefully) higher throughput, implying that the scheme would block less, and thus yield a higher throughput for any fixed number of cores. That is if the overhead of the chosen locking scheme is sufficiently small, of course. However this means that the test shoudl compare implementations different locking schemes of different granularities and test them against each other. A higher granularity locking scheme is probably faster (for any number of cores) as it implies a higher degree of concurrency, and hopefully the test would show this.
+          Now, say your test DID perform reads and writes (i.e. your locking mechanism would block threads to avoid conflicts, and concurrency becomes a factor), what you should test is that a higher granularity locking scheme -> higher degree of concurrency -> (hopefully) higher throughput, implying that the scheme would block less, and thus yield a higher throughput for any fixed number of cores. That is, if the overhead of the chosen locking scheme is sufficiently small, of course. However this means that the test should rather seek to compare implementations of different locking schemes (of different granularities) and test them against each other. A higher granularity locking scheme is probably faster (for any number of cores) as it implies a higher degree of concurrency, and hopefully such a test would show that.
 
-          That being said, I think that this kind of test is more suitable as a benchmark.
+          That being said, I think that this kind of test is more suitable as a benchmark, and the focus here should probably be testing semantics of different locking protocols.
 
           Regarding test 4, it never changes the forever variable, to the test passes unconditionally, and is basically not accomplishing anything but testing that that false == false.
 
@@ -160,9 +160,9 @@
           argument provided to be lacking, incorrect, or in need of improvement.
         </text>
         <answer>
-          2a) Yes, because any read-write locking scheme implemented with 1 lock conforms to Strict 2PL, Conservative 2PL, Conservative Strict 2PL, and 2PL at the same time. However, the chosen locking scheme has the absolutely lowest granularity of any read-write locking scheme, as there is only 1 lock for 1 object, greatly reducing granularity and the degree of concurrency altogether. This somewhat defeats the purpose of locking, as not a lot of concurrency is gained.
+          2a) Yes, because any read-write locking scheme implemented with 1 lock conforms to Strict 2PL, Conservative 2PL, Conservative Strict 2PL, and 2PL at the same time. However, the chosen locking scheme has the absolutely lowest granularity of any read-write locking scheme, as there is only 1 lock for 1 object, greatly reducing granularity and the degree of concurrency altogether. This somewhat defeats the purpose of locking, as not a lot of concurrency is gained. However, as you mention yourself, the overhead of locking is relatively small this way.
 
-          2c) You mention it, but this does not depend on the number of objects, but rather on whether new objects can be added/removed.
+          2c) You mention it, but doesn't this depend on whether new objects can be added/removed and not the number of objects?
         </answer>
       </q2d>
     </question2>
@@ -200,7 +200,7 @@
           improved
         </text>
         <answer>
-          However, even worse, nobody can read/write to ANY book while a thread is writing to ANY book. That is the contention of the chosen locking scheme imposes a massive bottleneck depending on how the application is being used.
+           Furthermore, NO one thread can read/write to ANY book while a thread is writing to ANY book. That is the contention of the chosen locking scheme imposes a massive bottleneck depending on how the application is being used.
         </answer>
       </q4b>
     </question4>
