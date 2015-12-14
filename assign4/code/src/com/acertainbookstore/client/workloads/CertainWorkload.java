@@ -5,11 +5,13 @@ package com.acertainbookstore.client.workloads;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.acertainbookstore.business.CertainBookStore;
+import com.acertainbookstore.business.StockBook;
 import com.acertainbookstore.client.BookStoreHTTPProxy;
 import com.acertainbookstore.client.StockManagerHTTPProxy;
 import com.acertainbookstore.interfaces.BookStore;
@@ -25,6 +27,9 @@ import com.acertainbookstore.utils.BookStoreException;
  *
  */
 public class CertainWorkload {
+
+    private static final int NUM_TOTAL_BOOKS = 1000;
+    private static final int NUM_INITIAL_ADD_BOOKS = 400;
 
     /**
      * @param args
@@ -102,8 +107,7 @@ public class CertainWorkload {
      */
     public static void initializeBookStoreData(BookStore bookStore,
             StockManager stockManager) throws BookStoreException {
-
-        // TODO: You should initialize data for your bookstore here
-
+        BookSetGenerator.generateAllBooks(NUM_TOTAL_BOOKS);
+        stockManager.addBooks( BookSetGenerator.nextSetOfStockBooks(NUM_INITIAL_ADD_BOOKS) );
     }
 }
