@@ -93,9 +93,29 @@
 
 \subsection*{Question 1: Recovery Concepts}
 \begin{enumerate}
-\item Answer here
-\item Answer here
-\item Answer here
+\item In a system forcing writes to disk when a transaction commits, it is \emph{not}
+  necessary to implement a scheme for redo, as all committed data will be on
+  disk. This is based on the assumption that the system does not crash in the
+  middle of writing committed data to disk, which is a very crude assumption.
+
+  In a system with no-steal, we do \emph{not} need to implement at scheme for
+  redo, as no uncommitted data will be written to disk.
+
+\item Nonvolatile storage (such as disk) can survive a system crash, but can
+  have media failures. Data stored in stable storage is assumed to never be
+  lost, even though this does usually not consider extreme cases such as atomic
+  bombs. Therefore the major difference is the resources/money required to
+  implement either.
+
+\item The rules of Write-Ahead Logging are 1) must write log for data updates
+  before writing the new data to disk, and 2) must write all log entries for a
+  transaction just before committing.
+
+  These two rules ensures durability (results are persistent). Rules 1) ensures
+  that we can undo changes that have been written to disk from transactions that
+  have not committed, and rule 2) ensures that if the system crashes immediately
+  after a commit (and before data is written), we still have all the necessary
+  information to redo the operation.
 \end{enumerate}
 
 \subsection*{Question 2: ARIES}
