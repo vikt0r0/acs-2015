@@ -237,10 +237,11 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
 \end{figure}
 
 \autoref{fig:throughput} shows the throughput when increasing the number of
-concurrent client threads. For the local case, we see that the throughput grow
-linearly when increasing the number of clients exponentially. Thus the
-throughput could be approximated by a logarithmic function of the number of
-concurrent clients.
+concurrent client threads. Generally we see the expected pattern, the more
+threads that are running, the more throughput we get. For the local case, we see
+that the throughput grow linearly when increasing the number of clients
+exponentially. Thus the throughput could be approximated by a logarithmic
+function of the number of concurrent clients.
 
 Throughput when running over RPC was extremely slow compared to running
 locally. We got 0.057 requests through per ms when using 1 client thread, and
@@ -258,7 +259,15 @@ throughput of 0.044.
   \label{fig:latency}
 \end{figure}
 
-\todo{something about latency}
+\autoref{fig:latency} show the latency when increasing the number of concurrent
+client threads. Again we have not been able to run the RPC in the configurations
+we wanted. We see that as the number of clients starts to rise, the latency is
+increased. This also seems natural; when there are many threads executing on the
+server side, a single request needs to wait longer before being processed, as it
+has to fight for access to resources.
+
+In the configuration with 100 client threads (that took 20 minutes), we saw an average
+latency of 2.2 seconds.
 
 \item Answer here
 
