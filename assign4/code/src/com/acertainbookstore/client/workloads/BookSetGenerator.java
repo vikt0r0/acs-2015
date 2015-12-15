@@ -50,8 +50,8 @@ public class BookSetGenerator {
 
         for(int i=0; i<num; i++) {
 
-            int titleLength = (int) Math.max(2, Math.round(10 + 8 * rnd.nextGaussian()));
-            int authorLength = (int) Math.max(2, Math.round(15 + 8 * rnd.nextGaussian()));
+            int titleLength = (int) Math.max(2, Math.round(10 + 3 * rnd.nextGaussian()));
+            int authorLength = (int) Math.max(2, Math.round(15 + 3 * rnd.nextGaussian()));
 
             int isbn = i+1;
             String title = generateName(rnd, titleChars, titleLength);
