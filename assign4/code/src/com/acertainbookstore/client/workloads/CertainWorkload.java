@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import com.acertainbookstore.business.CertainBookStore;
 import com.acertainbookstore.business.StockBook;
@@ -95,7 +96,22 @@ public class CertainWorkload {
      * @param workerRunResults
      */
     public static void reportMetric(List<WorkerRunResult> workerRunResults) {
-        // TODO: You should aggregate metrics and output them for plotting here
+        double latency = workerRunResults.stream()
+            .mapToDouble(res -> ((double)res.getElapsedTimeInNanoSecs()/1000000)/
+                 res.getSuccessfulInteractions())
+            .average()
+            .getAsDouble();
+
+        System.out.println("Latency: " + latency);
+
+        //Calculate throughput
+        double throughput = workerRunResults.stream()
+            .mapToDouble(res -> (double)res.getSuccessfulInteractions()/
+                         ((double)res.getElapsedTimeInNanoSecs()/1000000))
+            .sum();
+
+        System.out.println("Throughput: " + throughput);
+
     }
 
     /**

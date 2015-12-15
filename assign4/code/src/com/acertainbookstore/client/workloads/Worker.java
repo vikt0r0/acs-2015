@@ -105,7 +105,7 @@ public class Worker implements Callable<WorkerRunResult> {
     }
 
     /**
-     * Runs the new stock acquisition interaction 
+     * Runs the new stock acquisition interaction
      *
      * @throws BookStoreException
      */
