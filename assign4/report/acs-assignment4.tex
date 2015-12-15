@@ -158,17 +158,23 @@ T2      & 9       \\
 }
 \end{table}
 
-\item Loser transactions are the transactions that present in the transaction table with an associated lastLSN value, that is $\left\{ T1, T2 \right\}$. The single winner transaction is T3.
+\item Loser transactions are the transactions present in the transaction table with an associated \texttt{lastLSN} value, those are $\left\{ \texttt{T1}, \texttt{T2} \right\}$. The single winner transaction is \texttt{T3}.
 
 \item The redo-phase starts by re-applying the log entry with the smallest LSN that updates a page, i.e. the entry with LSN 3. The undo phase stops at the update entry with the lowest LSN among all loser transactions, in this case the entry with LSN 3.
 
-\item Records 8 and 9 updating page P3 and P5, as both pages were updated cf. entries.
+\item Entries 8 and 9 as well as 5 and 6 as they update pages P5 and P3, respectively.
 
 \item The records to be undone are all the entries associated with the loser transactions, i.e. $\left\{9, 8, 5, 4, 3\right\}$.
 
 \item Here, a CLR is written to the log for each update record encountered in the undo phase. The resulting log will be the original logfile shown in the assignent prepended to one shown in Listing \ref{lst:log}.
 \\
-\begin{lstlisting}[caption={Compensation log records for the undo-phase.},label={lst:log},escapeinside={@}{@}]LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN--- -------- ------- ---- -------  ------------- 11 NULL     T2      NULL P3       8 12 NULL     T2      NULL P5       5 13 NULL     T2      NULL P5       NULL 14 NULL     T1      NULL P1       3
+\begin{lstlisting}[caption={Compensation log records for the undo-phase.},label={lst:log},escapeinside={@}{@}]
+LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
+--- -------- ------- ---- -------  -------------
+ 11 NULL     T2      NULL P3       8
+ 12 NULL     T2      NULL P5       5
+ 13 NULL     T2      NULL P5       NULL
+ 14 NULL     T1      NULL P1       3
  15 NULL     T1      NULL P2       NULL
 \end{lstlisting}
 
