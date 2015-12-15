@@ -226,7 +226,8 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
 
 \item Answer here
 
-\item Answer here
+\item The reliability of the metrics depends on whether the mix of requests modeled by the workloads are representative for the actual distribution of requests. Furthermore, a higher number of runs would entail a higher degree of certainty for the measured metrics. Several other performance-related metrics might be interesting to measure for the bookstore. Some could be implemented with relative ease by modifying the solution to the workload code. For instance, it might be insightful to stress test the service for a duration corresponding to the expected uptime (between restarting the service, e.g. when patching it, etc.). This requires that the request rate and mix should representative for expected usage of the service. Furthermore, some robustness aspects could be interesting to measure. For instance if the service has memory leaks at peak loads. A scalability measure could be approximated by adding more cores and looking for correlations between number of cores and a decrease/increase in latency/throughput.
+
 \end{enumerate}
 
 % \acsplot{local data}{rpc data}{y axis label}{max}
