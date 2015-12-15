@@ -213,14 +213,16 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
   irrelevant to this assignment, but is uniformly random in the interval
   $[150,350)$.
 
-
-  The benchmarks has been executed on a laptop with 1.9GHz Core i7-3517U CPU and
+  The benchmarks has been performed on a laptop with 1.9GHz Core i7-3517U CPU and
   8GB of RAM running Linux with kernel version 4.1.12. The JVM used is OpenJDK
   1.8.0\_60.
 
-  We use the handout values for warmup runs (100) and actual runs (500).
+  We perform 100 warmup runs and 500 actual runs (unchanged from the handout
+  code). Each benchmark has been run 5 times (when possible, see next question)
+  and the presented result is the simple average of these runs.
 
-  \todo{measurement procedures (e.g., number of repetitions, statistics used such as average or deviation),}
+  The measurements consists of several parameters which are logged by the client
+  executing the benchmark.
 
 \item
 % \acsplot{local data}{rpc data}{y axis label}{max}
