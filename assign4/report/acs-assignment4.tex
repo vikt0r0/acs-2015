@@ -221,9 +221,19 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
   code). Each benchmark has been run 5 times (when possible, see next question)
   and the presented result is the simple average of these runs.
 
-  The measurements consists of several parameters which are logged by the client
-  executing the benchmark.
+  The measurements are performed by the client and includes logging of several
+  parameters including the total elapsed, number of total runs, number of
+  successful runs and number of high-frequency interactions. These parameters
+  are logged per-thread and we use them to calculate the latency and throughput
+  of the client. The formula for the latency is
+  $\frac{1}{N}\sum_{i=0}^N\frac{t_i}{s_i}$ where $N$ is the total number of
+  threads, $t_i$ is the total time elapsed and $s_i$ is the number of successful
+  interactions. The formula for the aggregated throughput is
+  $\sum_{i=0}^N\frac{s_i}{t_i}$.
 
+
+
+\item
 
 % \acsplot{local data}{rpc data}{y axis label}{max}
 
@@ -237,10 +247,11 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
 \end{figure}
 
 \autoref{fig:throughput} shows the throughput when increasing the number of
-concurrent client threads. For the local case, we see that the throughput grow
-linearly when increasing the number of clients exponentially. Thus the
-throughput could be approximated by a logarithmic function of the number of
-concurrent clients.
+concurrent client threads. Generally we see the expected pattern, the more
+threads that are running, the more throughput we get. For the local case, we see
+that the throughput grow linearly when increasing the number of clients
+exponentially. Thus the throughput could be approximated by a logarithmic
+function of the number of concurrent clients.
 
 Throughput when running over RPC was extremely slow compared to running
 locally. We got 0.057 requests through per ms when using 1 client thread, and
@@ -258,9 +269,15 @@ throughput of 0.044.
   \label{fig:latency}
 \end{figure}
 
-\todo{something about latency}
+\autoref{fig:latency} show the latency when increasing the number of concurrent
+client threads. Again we have not been able to run the RPC in the configurations
+we wanted. We see that as the number of clients starts to rise, the latency is
+increased. This also seems natural; when there are many threads executing on the
+server side, a single request needs to wait longer before being processed, as it
+has to fight for access to resources.
 
-\item Answer here
+In the configuration with 100 client threads (that took 20 minutes), we saw an average
+latency of 2.2 seconds.
 
 \item The reliability of the metrics depends on whether the mix of requests modeled by the workloads are representative for the actual use of the service, i.e. request rates and distribution. Furthermore, a higher number of runs entails a higher degree of certainty for the measured metrics, and thus a higher reliability.
 
