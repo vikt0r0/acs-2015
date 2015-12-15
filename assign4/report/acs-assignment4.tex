@@ -225,7 +225,7 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
   parameters including the total elapsed, number of total runs, number of
   successful runs and number of high-frequency interactions. These parameters
   are logged per-thread and we use them to calculate the latency and throughput
-  of the client. The formula for the latency is
+  experienced by clients interacting with the bookstore. The formula for the latency is
   $\frac{1}{N}\sum_{i=0}^N\frac{t_i}{s_i}$ where $N$ is the total number of
   threads, $t_i$ is the total time elapsed and $s_i$ is the number of successful
   interactions. The formula for the aggregated throughput is
