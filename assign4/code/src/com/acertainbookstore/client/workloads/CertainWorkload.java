@@ -83,6 +83,7 @@ public class CertainWorkload {
 
         // Finished initialization, stop the clients if not localTest
         if (!localTest) {
+            stockManager.removeAllBooks();
             ((BookStoreHTTPProxy) bookStore).stop();
             ((StockManagerHTTPProxy) stockManager).stop();
         }
