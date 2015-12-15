@@ -1,33 +1,33 @@
 \pgfplotstableread{
-threads value
-1    5.718
-10   17.536
-100  31.760
-1000 46.364
+threads value error
+1    5.718    1.0
+10   17.536   1.0
+100  31.760   1.0
+1000 46.364   1.0
 }\throughputlocal
 
 \pgfplotstableread{
-threads value
-1    46.0
-10   283.3
-100  613.4
-1000 720.2
+threads value error
+1    46.0     1.0
+10   283.3    1.0
+100  613.4    1.0
+1000 720.2    1.0
 }\throughputrpc
 
 \pgfplotstableread{
-threads value
-1    0.176
-10   0.592
-100  3.320
-1000 27.899
+threads value error
+1    0.176    1.0
+10   0.592    1.0
+100  3.320    1.0
+1000 27.899   1.0
 }\latencylocal
 
 \pgfplotstableread{
-threads value
-1    46.0
-10   283.3
-100  613.4
-1000 720.2
+threads value error
+1    46.0     1.0
+10   283.3    1.0
+100  613.4    1.0
+1000 720.2    1.0
 }\latencyrpc
 
 % local data, rpc data, title, max value
@@ -64,10 +64,10 @@ threads value
 %        cycle list name=exotic,
 %        colorbrewer cycle list=Set1-rwl,
 ]
-
-\addplot+ table [y=value, x expr=\coordindex] {#1};
+% TODO : add error bars by changing 'y dir=none' to 'y dir=both'
+\addplot+ [error bars/y dir=none,error bars/y explicit] table [y=value, x expr=\coordindex, y error=error] {#1};
 \addlegendentry{local};
-\addplot+ table [y=value, x expr=\coordindex] {#2};
+\addplot+ [error bars/y dir=none,error bars/y explicit] table [y=value, x expr=\coordindex, y error=error] {#2};
 \addlegendentry{RPC};
 \end{axis}
 \end{tikzpicture}
