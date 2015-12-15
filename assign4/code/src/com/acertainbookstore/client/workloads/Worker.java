@@ -47,11 +47,9 @@ public class Worker implements Callable<WorkerRunResult> {
      */
     private boolean runInteraction(float chooseInteraction) {
         try {
-            if (chooseInteraction < c
-                    .getPercentRareStockManagerInteraction()) {
+            if (chooseInteraction < c.getPercentRareStockManagerInteraction()) {
                 runRareStockManagerInteraction();
-            } else if (chooseInteraction < c
-                    .getPercentFrequentStockManagerInteraction()) {
+            } else if (chooseInteraction < c.getPercentFrequentStockManagerInteraction()) {
                 runFrequentStockManagerInteraction();
             } else {
                 numTotalFrequentBookStoreInteraction++;
