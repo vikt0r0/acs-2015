@@ -243,7 +243,9 @@ concurrent clients.
 Throughput when running over RPC was extremely slow compared to running
 locally. We got 0.057 requests through per ms when using 1 client thread, and
 0.086 requests per ms when using 10 client threads. Using more than this lead to
-such slow execution times that it was not feasible to study.
+such slow execution times that it was not feasible to study in detail. We did
+complete a run with 100 client threads (which took 20 minutes), which had a
+throughput of 0.044.
 
 \begin{figure}[H]
   \centering
