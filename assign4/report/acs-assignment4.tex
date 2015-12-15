@@ -221,8 +221,16 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
   code). Each benchmark has been run 5 times (when possible, see next question)
   and the presented result is the simple average of these runs.
 
-  The measurements consists of several parameters which are logged by the client
-  executing the benchmark.
+  The measurements are performed by the client and includes logging of several
+  parameters including the total elapsed, number of total runs, number of
+  successful runs and number of high-frequency interactions. These parameters
+  are logged per-thread and we use them to calculate the latency and throughput
+  of the client. The formula for the latency is
+  $\frac{1}{N}\sum_{i=0}^N\frac{t_i}{s_i}$ where $N$ is the total number of
+  threads, $t_i$ is the total time elapsed and $s_i$ is the number of successful
+  interactions. The formula for the aggregated throughput is
+  $\sum_{i=0}^N\frac{s_i}{t_i}$.
+
 
 \item
 % \acsplot{local data}{rpc data}{y axis label}{max}
