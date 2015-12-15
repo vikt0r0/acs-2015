@@ -113,6 +113,14 @@ public class CertainWorkload {
 
         System.out.println("Throughput: " + throughput);
 
+        int totalSuccess = workerRunResults.stream().mapToInt(res -> (int)res.getSuccessfulInteractions()).sum();
+        int totalInteractions = workerRunResults.stream().mapToInt(res -> res.getTotalRuns()).sum();
+
+        System.out.println("Total Sucess: " + ((double) totalSuccess)/((double) totalInteractions) +" ("+ totalSuccess + "/" + totalInteractions+")");
+
+        int totalCustomerInteractions = workerRunResults.stream().mapToInt(res -> res.getTotalFrequentBookStoreInteractionRuns()).sum();
+
+        System.out.println("Total Customer: " + ((double) totalCustomerInteractions)/((double) totalInteractions) +" ("+ totalCustomerInteractions + "/" + totalInteractions+")");
     }
 
     /**
