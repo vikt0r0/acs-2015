@@ -30,10 +30,12 @@
 \usepackage{lmodern} % better font
 \usepackage[noend]{algpseudocode}
 \usepackage{algorithm}
-\usepackage{tikz}
 \usepackage{paralist}
 \usepackage[font=footnotesize,labelfont=bf]{caption}
-\usetikzlibrary{arrows, decorations.markings}
+\usepackage{tikz}
+\usetikzlibrary{calc, arrows, decorations.markings}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
 \usepackage{hyperref} % always load hyper ref in the end
 \usepackage{cleveref} % except cleveref
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
@@ -72,6 +74,9 @@
 
 \rhead{Assignment 4}
 \lhead{ACS}
+
+\input{plots}
+
 \begin{document}
 
 \thispagestyle{empty} %fjerner sidetal
@@ -136,6 +141,26 @@
 \item Answer here
 \item Answer here
 \end{enumerate}
+
+% {local data}{rpc data}{y axis label}{max}
+
+\begin{figure}
+  \centering
+  \acsplot{\throughputlocal}{\throughputrpc}{Throughput}{800}
+  \caption{Development in throughput when running different number of
+    client threads, when running the backend in same addressspace (local) or
+    over RPC.}
+  \label{fig:throughput}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \acsplot{\latencylocal}{\latencyrpc}{Latency}{800}
+  \caption{Development in latency when running different number of
+    client threads, when running the backend in same addressspace (local) or
+    over RPC.}
+  \label{fig:latency}
+\end{figure}
 
 \end{document}
 

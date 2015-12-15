@@ -1,0 +1,74 @@
+\pgfplotstableread{
+threads value
+1    42.0
+10   253.3
+100  673.4
+1000 650.2
+}\throughputlocal
+
+\pgfplotstableread{
+threads value
+1    46.0
+10   283.3
+100  613.4
+1000 720.2
+}\throughputrpc
+
+\pgfplotstableread{
+threads value
+1    42.0
+10   253.3
+100  673.4
+1000 650.2
+}\latencylocal
+
+\pgfplotstableread{
+threads value
+1    46.0
+10   283.3
+100  613.4
+1000 720.2
+}\latencyrpc
+
+% local data, rpc data, title, max value
+\newcommand{\acsplot}[4]{
+\begin{tikzpicture}
+\begin{axis}[
+	xlabel={\emph{Client Threads}},
+        ylabel={\emph{#3}},
+        x label style={at={(axis description cs:0.5,0.0)},anchor=north,},
+        xticklabels from table={#1}{threads},
+        xtick=data,
+        enlarge x limits=0.25,
+        ymin=0,
+        ymax=#4,
+        yticklabel style={
+          /pgf/number format/precision=1,
+          /pgf/number format/fixed,
+          /pgf/number format/fixed zerofill=true
+        },
+%        ytick={0,10,...,80},
+        minor y tick num=1,
+        %bar width=20pt,
+        %xtick={0,1,...,3},
+        xtick pos=left,
+        ytick pos=left,
+        minor grid style={dotted,gray!80},
+        major grid style={dashed,gray!50},
+        ymajorgrids,
+        yminorgrids,
+%        title={Avg time for 1 timestep},
+        bar width=12pt,
+        legend pos=north west,
+        legend style={legend cell align=left},
+%        cycle list name=exotic,
+%        colorbrewer cycle list=Set1-rwl,
+]
+
+\addplot+ table [y=value, x expr=\coordindex] {#1};
+\addlegendentry{local};
+\addplot+ table [y=value, x expr=\coordindex] {#2};
+\addlegendentry{RPC};
+\end{axis}
+\end{tikzpicture}
+}
