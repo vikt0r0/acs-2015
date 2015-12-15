@@ -112,7 +112,7 @@ public class Worker implements Callable<WorkerRunResult> {
     private void runRareStockManagerInteraction() throws BookStoreException {
         StockManager sm = c.getStockManager();
         Set<StockBook> books = new HashSet<StockBook>(sm.getBooks());
-        Set<StockBook> genBooks = BookSetGenerator.nextSetOfStockBooks(c.getNumBooksToBuy());
+        Set<StockBook> genBooks = BookSetGenerator.nextSetOfStockBooks(c.getNumBooksToAdd());
         genBooks.removeAll(books);
         sm.addBooks(genBooks);
     }
@@ -131,7 +131,7 @@ public class Worker implements Callable<WorkerRunResult> {
         sm.addCopies(books
                      .stream()
                      .sorted(comparing)
-                     .map((book) -> new BookCopy(book.getISBN(), c.getNumBooksToAdd()))
+                     .map((book) -> new BookCopy(book.getISBN(), c.getNumAddCopies()))
                      .limit(c.getNumBooksWithLeastCopies())
                      .collect(Collectors.toSet()));
     }
@@ -143,7 +143,7 @@ public class Worker implements Callable<WorkerRunResult> {
      */
     private void runFrequentBookStoreInteraction() throws BookStoreException {
         BookStore bs = c.getBookStore();
-        List<Book> books = bs.getEditorPicks(2^31); // get all picks;
+        List<Book> books = bs.getEditorPicks(c.getNumEditorPicksToGet());
         Set<Integer> isbns = books
             .stream()
             .map((book) -> new Integer(book.getISBN()))
@@ -152,7 +152,7 @@ public class Worker implements Callable<WorkerRunResult> {
         Set<BookCopy> toBuy = c.getBookSetGenerator()
             .sampleFromSetOfISBNs(isbns, c.getNumBooksToBuy())
             .stream()
-            .map((isbn) -> new BookCopy(isbn, 10))
+            .map((isbn) -> new BookCopy(isbn, c.getNumBookCopiesToBuy()))
             .collect(Collectors.toSet());
 
         bs.buyBooks(toBuy);
