@@ -7,11 +7,11 @@ threads value error
 }\throughputlocal
 
 \pgfplotstableread{
-threads value
-1    0.057
-10   0.086
-100  0.044
-%1000 200
+threads value error
+1    0.057    1.0
+10   0.086    1.0
+100  0.044      1.0
+%1000 200      1.0
 }\throughputrpc
 
 \pgfplotstableread{
@@ -23,11 +23,11 @@ threads value error
 }\latencylocal
 
 \pgfplotstableread{
-threads value
-1    17.110
-10   116.286
-100  2260.005
-%1000 720.2
+threads value error
+1    17.110   1.0
+10   116.286  1.0
+100 2260.005  1.0
+%1000 720.2    1.0
 }\latencyrpc
 
 % local data, rpc data, title, max value
