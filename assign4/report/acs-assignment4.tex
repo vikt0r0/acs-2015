@@ -23,6 +23,7 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{courier}
 \usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{csquotes}
@@ -39,6 +40,8 @@
 \usepackage{hyperref} % always load hyper ref in the end
 \usepackage{cleveref} % except cleveref
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
 
 \newcommand*\justify{%
   \fontdimen2\font=0.4em% interword space
@@ -125,24 +128,105 @@
 
 \subsection*{Question 2: ARIES}
 \begin{enumerate}
-\item Answer here
-\item Answer here
-\item Answer here
-\item Answer here
-\item Answer here
-\item Answer here
+\item The transaction and dirty page table is shown in Table \ref{tbl:dirty} and \ref{tbl:transaction}, respectively.
+\begin{table}[!hbt]
+\parbox{.45\linewidth}{
+\centering
+\begin{tabular}{|l|l|}
+\hline
+pageID  & recLSN  \\ \hline
+P2      & 3       \\ \hline
+P1      & 4       \\ \hline
+P5      & 5       \\ \hline
+P3      & 6       \\ \hline
+\end{tabular}
+\caption{Dirty page table}
+\label{tbl:dirty}
+}
+\hfill
+\parbox{.45\linewidth}{
+\centering
+\begin{tabular}{|l|l|}
+\hline
+transID & lastLSN \\ \hline
+T1      & 4       \\ \hline
+T2      & 9       \\
+\hline
+\end{tabular}
+\caption{Transaction table}
+\label{tbl:transaction}
+}
+\end{table}
+
+\item Loser transactions are the transactions present in the transaction table with an associated \texttt{lastLSN} value, those are $\left\{ \texttt{T1}, \texttt{T2} \right\}$. The single winner transaction is \texttt{T3}.
+
+\item The redo-phase starts by re-applying the log entry with the smallest LSN that updates a page, i.e. the entry with LSN 3. The undo phase stops at the update entry with the lowest LSN among all loser transactions, in this case the entry with LSN 3.
+
+\item Entries 8 and 9 as well as 5 and 6 as they update pages P5 and P3, respectively.
+
+\item The records to be undone are all the entries associated with the loser transactions, i.e. $\left\{9, 8, 5, 4, 3\right\}$.
+
+\item Here, a CLR is written to the log for each update record encountered in the undo phase. The resulting log will be the original logfile shown in the assignent prepended to one shown in Listing \ref{lst:log}.
+\\
+\begin{lstlisting}[caption={Compensation log records for the undo-phase.},label={lst:log},escapeinside={@}{@}]
+LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
+--- -------- ------- ---- -------  -------------
+ 11 NULL     T2      NULL P3       8
+ 12 NULL     T2      NULL P5       5
+ 13 NULL     T2      NULL P5       NULL
+ 14 NULL     T1      NULL P1       3
+ 15 NULL     T1      NULL P2       NULL
+\end{lstlisting}
+
 \end{enumerate}
 
 \section*{Programming Task}
 \subsection*{Overview of Implementation}
 \subsection*{Discussion on the Performance Measurements}
 \begin{enumerate}
+\item We initially generate a set of books possible to add to the bookstore,
+  which we then use a subset of as the initial books in the bookstore.
+
+  We use \verb|numBooksToAdd| with a value of 5. As 10\% of the $500+100 = 600$
+  runs by a worker are ``addBooks interactions'', we will get $60$ such
+  interactions per worker, thus resulting in $60 \times 5 = 300$ books attempted
+  to be added per worker. Ignoring the effects of random sampling, we would need
+  $300 \times \mathtt{numConcurrentWorkloadThreads}$ books in the universe
+  initially not added to the bookstore, to make sure every ``addBooks
+  interactions'' would expand the bookstore with 5 new books. Note that an
+  attempt to add 0 new books will be counted as a successful interaction, and
+  will still require to go (briefly) into the \verb|addBooks| method thereby
+  congesting the queue for access to the synchronization.
+
+  In our experiments we run a maximum of \todo{???} threads, and create a
+  universe of 1000 books (controlled by \verb|NUM_TOTAL_BOOKS|) and initially
+  add 400 books to the bookstore (\verb|NUM_INITIAL_ADD_BOOKS|).
+
+  \todo{change these numbers above (both here and in code) so they make sense}
+
+  Book generation is done pseudo-randomly for each book, with ISBNs being
+  $1,2,\cdots$. A book becomes an editor pick with a chance of $10\%$, number of
+  copies is uniformly randomly picked from the integer interval $[1,20]$. Title
+  and author name is randomly generated from the characters \verb|[a-zA-Z]| with
+  a length determined by a Gaussian distribution -- but at least length 2. The
+  title length has a mean of 10 and a standard deviation of 3, while the author
+  name length has a mean of 15 and a standard deviation of 3. These values where
+  picked using a rough estimate after look at a bookshelf. Book price is
+  irrelevant to this assignment, but is uniformly random in the interval
+  $[150,350)$.
+
+  \todo{hardware employed}
+
+  We use the handout values for warmup runs (100) and actual runs (500).
+
+  \todo{measurement procedures (e.g., number of repetitions, statistics used such as average or deviation),}
+
 \item Answer here
-\item Answer here
+
 \item Answer here
 \end{enumerate}
 
-% {local data}{rpc data}{y axis label}{max}
+% \acsplot{local data}{rpc data}{y axis label}{max}
 
 \begin{figure}
   \centering
