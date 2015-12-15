@@ -198,7 +198,7 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
   will still require to go (briefly) into the \verb|addBooks| method thereby
   congesting the queue for access to the synchronization.
 
-  In our experiments we run a maximum of \todo{???} threads, and create a
+  In our experiments we run a maximum of 1000 threads, and create a
   universe of 1000 books (controlled by \verb|NUM_TOTAL_BOOKS|) and initially
   add 400 books to the bookstore (\verb|NUM_INITIAL_ADD_BOOKS|).
 
@@ -215,7 +215,10 @@ LSN LAST_LSN TRAN_ID TYPE PAGE_ID  UNDO_NEXT_LSN
   irrelevant to this assignment, but is uniformly random in the interval
   $[150,350)$.
 
-  \todo{hardware employed}
+
+  The benchmarks has been executed on a laptop with 1.9GHz Core i7-3517U CPU and
+  8GB of RAM running Linux with kernel version 4.1.12. The JVM used is OpenJDK
+  1.8.0\_60.
 
   We use the handout values for warmup runs (100) and actual runs (500).
 
